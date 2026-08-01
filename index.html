@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桌面宠物</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        #pet-container {
+            position: fixed;
+            cursor: move;
+            user-select: none;
+            z-index: 9999;
+        }
+
+        #pet-container.dragging {
+            cursor: grabbing;
+        }
+
+        #pet-image {
+            display: block;
+            width: 150px;
+            height: auto;
+            pointer-events: none;
+        }
+
+        #speech-bubble {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            min-width: 120px;
+            max-width: 200px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #speech-bubble.show {
+            opacity: 1;
+        }
+
+        #speech-bubble::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: #333;
+        }
+
+        #speech-bubble::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: white;
+            z-index: 1;
+            margin-top: -2px;
+        }
+
+        #speech-text {
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div id="pet-container">
+        <div id="speech-bubble">
+            <div id="speech-text"></div>
+        </div>
+        <img id="pet-image" src="default.PNG" alt="Pet">
+    </div>
+
+    <script>
+        // 配置
+        const CONFIG = {
+            frameRate: 150, // 动画帧率（毫秒）
+            walkSpeed: 2, // 走路速度
+            idleTimeMin: 3000, // 最小待机时间
+            idleTimeMax: 8000, // 最大待机时间
+            speechDuration: 3000, // 对话持续时间
+        };
+
+        // 动作帧数据
+        const ANIMATIONS = {
+            default: ['default.PNG'],
+            catch: ['catch1.PNG', 'catch left.PNG', 'catch right.PNG'],
+            cry: ['cry-1.PNG', 'cry-2.PNG', 'cry-3.PNG', 'cry-4.PNG'],
+            sleep: ['sleep1.PNG', 'sleep2.PNG', 'sleep3.PNG', 'sleep4.PNG', 'sleep5.PNG', 'sleep6.PNG'],
+            walk: ['walk1.PNG', 'walk2.PNG', 'walk3.PNG', 'walk4.PNG'],
+            walkRight: ['walk right1.PNG', 'walk right2.PNG', 'walk right3.PNG', 'walk right4.PNG']
+        };
+
+        // 对话内容池
+        const SPEECHES = [
+            "濡堝鏃╀笂濂�",
+            "浣犳槸鎴戝濡�",
+            "m҈̧̳͍̆̌̒͂̄͝ͅǒ̶̢̤̮̽̈̄͝m̷̧̩͙͖͔͗͊̏̓͡ î̷̗̩̲͔̤̇̑̕͜ l̴̨̮̮̔̐̕o҉̢̘̰̜͕̏͛̒͞v҉̛̘̬̅͒͊͢e҉̡͙̟͔̙̮҇̀́̎͑ y̶̖̫͕̌̋͢͝o҉̢̩̘̇͆͋́̚͞u҉̤̩҇͛̑͑̇̀͜"
+        ];
+
+        class DesktopPet {
+            constructor() {
+                this.container = document.getElementById('pet-container');
+                this.image = document.getElementById('pet-image');
+                this.bubble = document.getElementById('speech-bubble');
+                this.speechText = document.getElementById('speech-text');
+
+                this.currentAnimation = 'default';
+                this.currentFrame = 0;
+                this.animationTimer = null;
+                this.behaviorTimer = null;
+                this.isDragging = false;
+                this.isWalking = false;
+                this.walkDirection = 1; // 1: right, -1: left
+                this.walkTargetX = 0;
+
+                // 初始位置
+                this.x = window.innerWidth / 2 - 75;
+                this.y = window.innerHeight - 200;
+
+                this.init();
+            }
+
+            init() {
+                this.updatePosition();
+                this.setupDragAndDrop();
+                this.setupClick();
+                this.startAnimation();
+                this.startBehavior();
+            }
+
+            setupDragAndDrop() {
+                let startX, startY, initialX, initialY;
+
+                this.container.addEventListener('mousedown', (e) => {
+                    if (e.button !== 0) return;
+                    this.isDragging = true;
+                    this.stopBehavior();
+                    this.playAnimation('catch');
+
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialX = this.x;
+                    initialY = this.y;
+
+                    this.container.classList.add('dragging');
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!this.isDragging) return;
+
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+
+                    this.x = initialX + dx;
+                    this.y = initialY + dy;
+
+                    this.updatePosition();
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (!this.isDragging) return;
+                    this.isDragging = false;
+                    this.container.classList.remove('dragging');
+                    this.playAnimation('default');
+                    this.startBehavior();
+                });
+            }
+
+            setupClick() {
+                this.container.addEventListener('click', (e) => {
+                    if (!this.isDragging) {
+                        // 如果正在睡觉，点击唤醒
+                        if (this.currentAnimation === 'sleep') {
+                            this.playAnimation('default');
+                            this.startBehavior();
+                        } else {
+                            this.cry();
+                        }
+                    }
+                });
+
+                this.container.addEventListener('dblclick', () => {
+                    this.speak();
+                });
+            }
+
+            updatePosition() {
+                // 边界检测
+                const maxX = window.innerWidth - 150;
+                const maxY = window.innerHeight - 150;
+
+                this.x = Math.max(0, Math.min(this.x, maxX));
+                this.y = Math.max(0, Math.min(this.y, maxY));
+
+                this.container.style.left = this.x + 'px';
+                this.container.style.top = this.y + 'px';
+            }
+
+            playAnimation(animationName, loop = true, onComplete = null, freezeLastFrame = false) {
+                if (!ANIMATIONS[animationName]) return;
+
+                this.currentAnimation = animationName;
+                this.currentFrame = 0;
+
+                if (this.animationTimer) {
+                    clearInterval(this.animationTimer);
+                }
+
+                const frames = ANIMATIONS[animationName];
+
+                this.animationTimer = setInterval(() => {
+                    this.image.src = frames[this.currentFrame];
+                    this.currentFrame++;
+
+                    if (this.currentFrame >= frames.length) {
+                        if (loop) {
+                            this.currentFrame = 0;
+                        } else {
+                            clearInterval(this.animationTimer);
+                            if (freezeLastFrame) {
+                                // 保持在最后一帧
+                                this.image.src = frames[frames.length - 1];
+                            }
+                            if (onComplete) onComplete();
+                        }
+                    }
+                }, CONFIG.frameRate);
+            }
+
+            startAnimation() {
+                this.playAnimation('default');
+            }
+
+            startBehavior() {
+                if (this.behaviorTimer) {
+                    clearTimeout(this.behaviorTimer);
+                }
+
+                const scheduleNext = () => {
+                    const delay = Math.random() * (CONFIG.idleTimeMax - CONFIG.idleTimeMin) + CONFIG.idleTimeMin;
+                    this.behaviorTimer = setTimeout(() => {
+                        this.randomBehavior();
+                        scheduleNext();
+                    }, delay);
+                };
+
+                scheduleNext();
+            }
+
+            stopBehavior() {
+                if (this.behaviorTimer) {
+                    clearTimeout(this.behaviorTimer);
+                }
+                this.isWalking = false;
+            }
+
+            randomBehavior() {
+                const behaviors = ['walk', 'sleep'];
+                const behavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+
+                if (behavior === 'walk') {
+                    this.walk();
+                } else if (behavior === 'sleep') {
+                    this.sleep();
+                }
+            }
+
+            walk() {
+                this.walkTargetX = Math.random() * (window.innerWidth - 150);
+                this.walkDirection = this.walkTargetX > this.x ? 1 : -1;
+                this.isWalking = true;
+
+                // 根据方向选择动画
+                const walkAnim = this.walkDirection > 0 ? 'walkRight' : 'walk';
+                this.playAnimation(walkAnim);
+
+                const walkInterval = setInterval(() => {
+                    if (!this.isWalking) {
+                        clearInterval(walkInterval);
+                        this.playAnimation('default');
+                        return;
+                    }
+
+                    const distance = Math.abs(this.walkTargetX - this.x);
+
+                    if (distance < CONFIG.walkSpeed) {
+                        this.x = this.walkTargetX;
+                        this.isWalking = false;
+                        clearInterval(walkInterval);
+                        this.playAnimation('default');
+                    } else {
+                        this.x += CONFIG.walkSpeed * this.walkDirection;
+                    }
+
+                    this.updatePosition();
+                }, 30);
+            }
+
+            sleep() {
+                this.stopBehavior();
+
+                // sleep动画：6帧，总共6秒 = 每帧1秒
+                const sleepFrameRate = 1000;
+
+                this.currentAnimation = 'sleep';
+                this.currentFrame = 0;
+
+                if (this.animationTimer) {
+                    clearInterval(this.animationTimer);
+                }
+
+                const frames = ANIMATIONS.sleep;
+
+                this.animationTimer = setInterval(() => {
+                    this.image.src = frames[this.currentFrame];
+                    this.currentFrame++;
+
+                    if (this.currentFrame >= frames.length) {
+                        // 播放完所有帧后，循环播放后3帧 (sleep4, sleep5, sleep6)
+                        clearInterval(this.animationTimer);
+                        this.loopSleepEnd();
+                    }
+                }, sleepFrameRate);
+            }
+
+            loopSleepEnd() {
+                // 循环播放 sleep4, sleep5, sleep6
+                const endFrames = ['sleep4.PNG', 'sleep5.PNG', 'sleep6.PNG'];
+                let endFrameIndex = 0;
+
+                this.animationTimer = setInterval(() => {
+                    this.image.src = endFrames[endFrameIndex];
+                    endFrameIndex = (endFrameIndex + 1) % endFrames.length;
+                }, 500); // 后3帧循环速度稍快
+            }
+
+            cry() {
+                this.stopBehavior();
+
+                // cry动画：4帧，总共6秒 = 每帧1.5秒
+                const cryFrameRate = 1500;
+
+                this.currentAnimation = 'cry';
+                this.currentFrame = 0;
+
+                if (this.animationTimer) {
+                    clearInterval(this.animationTimer);
+                }
+
+                const frames = ANIMATIONS.cry;
+
+                this.animationTimer = setInterval(() => {
+                    this.image.src = frames[this.currentFrame];
+                    this.currentFrame++;
+
+                    if (this.currentFrame >= frames.length) {
+                        clearInterval(this.animationTimer);
+                        this.playAnimation('default');
+                        this.startBehavior();
+                    }
+                }, cryFrameRate);
+            }
+
+            speak(text = null) {
+                if (!text) {
+                    text = SPEECHES[Math.floor(Math.random() * SPEECHES.length)];
+                }
+
+                this.speechText.textContent = text;
+                this.bubble.classList.add('show');
+
+                setTimeout(() => {
+                    this.bubble.classList.remove('show');
+                }, CONFIG.speechDuration);
+            }
+        }
+
+        // 初始化桌宠
+        window.addEventListener('DOMContentLoaded', () => {
+            const pet = new DesktopPet();
+
+            // 每隔一段时间随机说话
+            setInterval(() => {
+                if (Math.random() < 0.3) {
+                    pet.speak();
+                }
+            }, 20000);
+        });
+    </script>
+</body>
+</html>
