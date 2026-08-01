@@ -92,7 +92,7 @@
         <div id="speech-bubble">
             <div id="speech-text"></div>
         </div>
-        <img id="pet-image" src="default.PNG" alt="Pet">
+        <img id="pet-image" src="default.png" alt="Pet">
     </div>
 
     <script>
@@ -107,12 +107,12 @@
 
         // 动作帧数据
         const ANIMATIONS = {
-            default: ['default.PNG'],
-            catch: ['catch1.PNG', 'catch left.PNG', 'catch right.PNG'],
-            cry: ['cry-1.PNG', 'cry-2.PNG', 'cry-3.PNG', 'cry-4.PNG'],
-            sleep: ['sleep1.PNG', 'sleep2.PNG', 'sleep3.PNG', 'sleep4.PNG', 'sleep5.PNG', 'sleep6.PNG'],
-            walk: ['walk1.PNG', 'walk2.PNG', 'walk3.PNG', 'walk4.PNG'],
-            walkRight: ['walk right1.PNG', 'walk right2.PNG', 'walk right3.PNG', 'walk right4.PNG']
+            default: ['default.png'],
+            catch: ['catch1.png', 'catch-left.png', 'catch-right.png'],
+            cry: ['cry-1.png', 'cry-2.png', 'cry-3.png', 'cry-4.png'],
+            sleep: ['sleep1.png', 'sleep2.png', 'sleep3.png', 'sleep4.png', 'sleep5.png', 'sleep6.png'],
+            walk: ['walk1.png', 'walk2.png', 'walk3.png', 'walk4.png'],
+            walkRight: ['walk-right1.png', 'walk-right2.png', 'walk-right3.png', 'walk-right4.png']
         };
 
         // 对话内容池
@@ -351,7 +351,7 @@
 
             loopSleepEnd() {
                 // 循环播放 sleep4, sleep5, sleep6
-                const endFrames = ['sleep4.PNG', 'sleep5.PNG', 'sleep6.PNG'];
+                const endFrames = ['sleep4.png', 'sleep5.png', 'sleep6.png'];
                 let endFrameIndex = 0;
 
                 this.animationTimer = setInterval(() => {
