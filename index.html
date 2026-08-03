@@ -13,15 +13,15 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
-        /* ── 宠物 ── */
-        #pet-container {
+        /* ── 宠物容器（动态创建，class="pet-container"） ── */
+        .pet-container {
             position: fixed;
             cursor: move;
             user-select: none;
             z-index: 9999;
         }
-        #pet-container.dragging { cursor: grabbing; }
-        #pet-image {
+        .pet-container.dragging { cursor: grabbing; }
+        .pet-image {
             display: block;
             width: 150px;
             height: auto;
@@ -29,7 +29,7 @@
         }
 
         /* ── 对话气泡 ── */
-        #speech-bubble {
+        .speech-bubble {
             position: absolute;
             bottom: 100%;
             left: 50%;
@@ -45,9 +45,10 @@
             pointer-events: none;
             transition: opacity 0.3s;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
         }
-        #speech-bubble.show { opacity: 1; }
-        #speech-bubble::after {
+        .speech-bubble.show { opacity: 1; }
+        .speech-bubble::after {
             content: '';
             position: absolute;
             top: 100%; left: 50%;
@@ -55,7 +56,7 @@
             border: 10px solid transparent;
             border-top-color: #333;
         }
-        #speech-bubble::before {
+        .speech-bubble::before {
             content: '';
             position: absolute;
             top: 100%; left: 50%;
@@ -65,7 +66,16 @@
             z-index: 1;
             margin-top: -2px;
         }
-        #speech-text { font-size: 14px; color: #333; text-align: center; word-wrap: break-word; }
+        .speech-text { font-size: 13px; color: #333; text-align: center; word-wrap: break-word; }
+
+        /* ── 掉落动画 ── */
+        @keyframes dropIn {
+            from { transform: translateY(-180px); opacity: 0; }
+            to   { transform: translateY(0);      opacity: 1; }
+        }
+        .pet-container.dropping {
+            animation: dropIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
 
         /* ── 内容查看器面板 ── */
         #viewer-panel {
@@ -126,14 +136,7 @@
             border-radius: 6px;
         }
         #viewer-close-btn:hover { color: white; background: rgba(255,255,255,0.1); }
-
-        #viewer-frame {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background: white;
-        }
-
+        #viewer-frame { flex: 1; width: 100%; border: none; background: white; }
         #viewer-placeholder {
             flex: 1;
             display: flex;
@@ -144,29 +147,48 @@
             gap: 12px;
         }
         #viewer-placeholder .hint {
-            font-size: 13px;
-            color: #666;
-            text-align: center;
-            line-height: 1.6;
+            font-size: 13px; color: #666; text-align: center; line-height: 1.6;
         }
 
-        /* ── 打开查看器的悬浮按钮 ── */
-        #open-viewer-btn {
+        /* ── 右下角悬浮按钮组 ── */
+        #fab-group {
             position: fixed;
             bottom: 20px; right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 8000;
+        }
+        .fab {
             width: 44px; height: 44px;
-            background: #1a1a2e;
-            color: white;
             border: none;
             border-radius: 50%;
             cursor: pointer;
             font-size: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 8000;
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.2s, background 0.2s;
+            color: white;
         }
-        #open-viewer-btn:hover { transform: scale(1.1); background: #e94560; }
+        .fab:hover { transform: scale(1.1); }
+        #open-viewer-btn { background: #1a1a2e; }
+        #open-viewer-btn:hover { background: #e94560; }
+        #add-pet-btn { background: #2e7d32; }
+        #add-pet-btn:hover { background: #1b5e20; }
+        #add-pet-btn:disabled { background: #777; cursor: not-allowed; transform: none; }
+
+        /* ── 宠物数量提示 ── */
+        #pet-count-badge {
+            position: fixed;
+            bottom: 72px; right: 20px;
+            background: rgba(0,0,0,0.55);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            z-index: 8000;
+            pointer-events: none;
+        }
 
         /* ── 遮罩 ── */
         #viewer-overlay {
@@ -181,14 +203,14 @@
 </head>
 <body>
 
-    <!-- 宠物 -->
-    <div id="pet-container">
-        <div id="speech-bubble"><div id="speech-text"></div></div>
-        <img id="pet-image" src="default.png" alt="Pet">
+    <!-- 按钮组 -->
+    <div id="fab-group">
+        <button class="fab" id="open-viewer-btn" title="打开内容查看器">🌐</button>
+        <button class="fab" id="add-pet-btn" title="召唤完能（最多20只）">➕</button>
     </div>
 
-    <!-- 打开查看器按钮 -->
-    <button id="open-viewer-btn" title="打开内容查看器">🌐</button>
+    <!-- 宠物数量提示 -->
+    <div id="pet-count-badge">1 / 20</div>
 
     <!-- 遮罩 -->
     <div id="viewer-overlay"></div>
@@ -202,10 +224,7 @@
         </div>
         <div id="viewer-placeholder">
             <div style="font-size:48px">🌐</div>
-            <div class="hint">
-                输入任意网址或视频链接<br>
-                支持 YouTube、Bilibili、普通网页等
-            </div>
+            <div class="hint">输入任意网址或视频链接<br>支持 YouTube、Bilibili、普通网页等</div>
         </div>
         <iframe id="viewer-frame" style="display:none" allowfullscreen
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
@@ -213,15 +232,16 @@
     </div>
 
     <script>
-        // ── 配置 ──
+        const MAX_PETS = 20;
+
         const CONFIG = {
             frameRate: 150,
             walkSpeed: 2,
             idleTimeMin: 4000,
             idleTimeMax: 9000,
             speechDuration: 3000,
-            sleepLoopDuration: 15000,  // 睡觉循环持续时长（ms）后自动醒
-            cryLoopDuration: 10000,    // 哭泣循环持续时长（ms）后自动停
+            sleepLoopDuration: 15000,
+            cryLoopDuration: 10000,
         };
 
         const ANIMATIONS = {
@@ -239,44 +259,64 @@
             "m҈̧̳͍̆̌̒͂̄͝ͅǒ̶̢̤̮̽̈̄͝m̷̧̩͙͖͔͗͊̏̓͡ î̷̗̩̲͔̤̇̑̕͜ l̴̨̮̮̔̐̕o҉̢̘̰̜͕̏͛̒͞v҉̛̘̬̅͒͊͢e҉̡͙̟͔̙̮҇̀́̎͑ y̶̖̫͕̌̋͢͝o҉̢̩̘̇͆͋́̚͞u҉̤̩҇͛̑͑̇̀͜",
         ];
 
-        // ── 桌宠类 ──
+        // ── 宠物实例列表 ──
+        const pets = [];
+
+        function updateBadge() {
+            document.getElementById('pet-count-badge').textContent = `${pets.length} / ${MAX_PETS}`;
+            document.getElementById('add-pet-btn').disabled = pets.length >= MAX_PETS;
+        }
+
+        // ── 宠物类 ──
         class DesktopPet {
-            constructor() {
-                this.container  = document.getElementById('pet-container');
-                this.image      = document.getElementById('pet-image');
-                this.bubble     = document.getElementById('speech-bubble');
-                this.speechText = document.getElementById('speech-text');
-
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
                 this.currentAnimation = 'default';
-                this.animationTimer   = null;  // setInterval（帧循环）
-                this.animationTimeout = null;  // setTimeout（帧序列）
-                this.behaviorTimer    = null;  // setTimeout（下次随机行为）
-                this.loopEndTimer     = null;  // setTimeout（sleep/cry 自动结束）
-                this.walkInterval     = null;  // setInterval（移动循环）
+                this.animationTimer   = null;
+                this.animationTimeout = null;
+                this.behaviorTimer    = null;
+                this.loopEndTimer     = null;
+                this.walkInterval     = null;
+                this.isDragging       = false;
+                this.isWalking        = false;
 
-                this.isDragging = false;
-                this.isWalking  = false;
-
-                this.x = window.innerWidth / 2 - 75;
-                this.y = window.innerHeight - 200;
-
-                this.init();
-            }
-
-            init() {
+                this._buildDOM();
+                this._setupDrag();
+                this._setupClick();
                 this.updatePosition();
-                this.setupDrag();
-                this.setupClick();
+
+                // 掉落动画
+                this.container.classList.add('dropping');
+                this.container.addEventListener('animationend', () => {
+                    this.container.classList.remove('dropping');
+                }, { once: true });
+
                 this.setImage('default.png');
                 this.scheduleBehavior();
             }
 
-            // ── 图片 ──
-            setImage(src) {
-                this.image.src = src;
+            _buildDOM() {
+                this.container = document.createElement('div');
+                this.container.className = 'pet-container';
+
+                this.bubbleEl = document.createElement('div');
+                this.bubbleEl.className = 'speech-bubble';
+                this.speechTextEl = document.createElement('div');
+                this.speechTextEl.className = 'speech-text';
+                this.bubbleEl.appendChild(this.speechTextEl);
+
+                this.imageEl = document.createElement('img');
+                this.imageEl.className = 'pet-image';
+                this.imageEl.alt = 'Pet';
+
+                this.container.appendChild(this.bubbleEl);
+                this.container.appendChild(this.imageEl);
+                document.body.appendChild(this.container);
             }
 
-            // ── 清除所有定时器 ──
+            setImage(src) { this.imageEl.src = src; }
+
             clearAll() {
                 clearInterval(this.animationTimer);  this.animationTimer  = null;
                 clearTimeout(this.animationTimeout); this.animationTimeout = null;
@@ -286,7 +326,6 @@
                 this.isWalking = false;
             }
 
-            // ── 停止当前动画，回到待机并安排下次行为 ──
             returnToIdle() {
                 this.clearAll();
                 this.currentAnimation = 'default';
@@ -294,7 +333,6 @@
                 this.scheduleBehavior();
             }
 
-            // ── 循环播放帧数组 ──
             playLoop(frames, interval) {
                 clearInterval(this.animationTimer);
                 let i = 0;
@@ -305,7 +343,6 @@
                 }, interval);
             }
 
-            // ── 顺序播放帧数组，完成后回调 ──
             playSequence(frames, interval, onDone) {
                 clearTimeout(this.animationTimeout);
                 let i = 0;
@@ -314,21 +351,19 @@
                     i++;
                     if (i < frames.length) {
                         this.animationTimeout = setTimeout(next, interval);
-                    } else {
-                        if (onDone) onDone();
+                    } else if (onDone) {
+                        onDone();
                     }
                 };
                 next();
             }
 
-            // ── 安排下次随机行为 ──
             scheduleBehavior() {
                 clearTimeout(this.behaviorTimer);
                 const delay = CONFIG.idleTimeMin + Math.random() * (CONFIG.idleTimeMax - CONFIG.idleTimeMin);
                 this.behaviorTimer = setTimeout(() => this.randomBehavior(), delay);
             }
 
-            // ── 随机行为 ──
             randomBehavior() {
                 const behaviors = ['walk', 'walk', 'walk', 'walkLeft', 'walkRight', 'walkUp', 'walkDown', 'sleep', 'cry'];
                 const pick = behaviors[Math.floor(Math.random() * behaviors.length)];
@@ -343,7 +378,6 @@
                 }
             }
 
-            // ── 行走（随机目标） ──
             walk(targetX) {
                 const tx = targetX !== null ? targetX : Math.random() * (window.innerWidth - 150);
                 const dir = tx > this.x ? 1 : -1;
@@ -392,32 +426,25 @@
                 }, 30);
             }
 
-            // ── 睡觉：顺序播6帧 → 循环后3帧 → 15秒后自动醒 ──
             sleep() {
                 this.clearAll();
                 this.currentAnimation = 'sleep';
                 this.playSequence(ANIMATIONS.sleep, 833, () => {
-                    // 进入循环
                     this.playLoop(['sleep4.png', 'sleep5.png', 'sleep6.png'], 500);
-                    // 15秒后自动醒
                     this.loopEndTimer = setTimeout(() => this.returnToIdle(), CONFIG.sleepLoopDuration);
                 });
             }
 
-            // ── 哭泣：顺序播4帧 → 循环后2帧 → 10秒后自动停 ──
             cry() {
                 this.clearAll();
                 this.currentAnimation = 'cry';
                 this.playSequence(ANIMATIONS.cry, 1250, () => {
-                    // 进入循环
                     this.playLoop(['cry-3.png', 'cry-4.png'], 600);
-                    // 10秒后自动停
                     this.loopEndTimer = setTimeout(() => this.returnToIdle(), CONFIG.cryLoopDuration);
                 });
             }
 
-            // ── 拖拽 ──
-            setupDrag() {
+            _setupDrag() {
                 let sx, sy, ix, iy;
                 this.container.addEventListener('mousedown', (e) => {
                     if (e.button !== 0) return;
@@ -444,8 +471,7 @@
                 });
             }
 
-            // ── 点击：唤醒 or 触发哭泣 ──
-            setupClick() {
+            _setupClick() {
                 this.container.addEventListener('click', () => {
                     if (this.isDragging) return;
                     if (this.currentAnimation === 'sleep' || this.currentAnimation === 'cry') {
@@ -457,7 +483,6 @@
                 this.container.addEventListener('dblclick', () => this.speak());
             }
 
-            // ── 位置更新 ──
             updatePosition() {
                 this.x = Math.max(0, Math.min(this.x, window.innerWidth - 150));
                 this.y = Math.max(0, Math.min(this.y, window.innerHeight - 150));
@@ -465,14 +490,46 @@
                 this.container.style.top  = this.y + 'px';
             }
 
-            // ── 说话 ──
             speak(text) {
                 const t = text || SPEECHES[Math.floor(Math.random() * SPEECHES.length)];
-                this.speechText.textContent = t;
-                this.bubble.classList.add('show');
-                setTimeout(() => this.bubble.classList.remove('show'), CONFIG.speechDuration);
+                this.speechTextEl.textContent = t;
+                this.bubbleEl.classList.add('show');
+                setTimeout(() => this.bubbleEl.classList.remove('show'), CONFIG.speechDuration);
+            }
+
+            destroy() {
+                this.clearAll();
+                this.container.remove();
             }
         }
+
+        // ── 召唤一只新宠物 ──
+        function spawnPet() {
+            if (pets.length >= MAX_PETS) return;
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = -10; // 从顶部掉落
+            const pet = new DesktopPet(x, y);
+            pets.push(pet);
+            updateBadge();
+        }
+
+        // ── 初始化第一只 ──
+        window.addEventListener('DOMContentLoaded', () => {
+            const first = new DesktopPet(
+                window.innerWidth / 2 - 75,
+                window.innerHeight - 200
+            );
+            pets.push(first);
+            updateBadge();
+
+            // 随机说话
+            setInterval(() => {
+                pets.forEach(p => { if (Math.random() < 0.15) p.speak(); });
+            }, 20000);
+
+            // ── 按钮 ──
+            document.getElementById('add-pet-btn').addEventListener('click', spawnPet);
+        });
 
         // ── 内容查看器 ──
         const viewerPanel       = document.getElementById('viewer-panel');
@@ -480,9 +537,6 @@
         const viewerFrame       = document.getElementById('viewer-frame');
         const viewerPlaceholder = document.getElementById('viewer-placeholder');
         const viewerUrlInput    = document.getElementById('viewer-url-input');
-        const openBtn           = document.getElementById('open-viewer-btn');
-        const closeBtn          = document.getElementById('viewer-close-btn');
-        const goBtn             = document.getElementById('viewer-go-btn');
 
         function openViewer() {
             viewerPanel.classList.add('open');
@@ -495,50 +549,30 @@
             viewerFrame.style.display = 'none';
             viewerPlaceholder.style.display = 'flex';
         }
-
         function toEmbedUrl(raw) {
             let url = raw.trim();
             if (!url.startsWith('http')) url = 'https://' + url;
-
-            // YouTube
             const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
             if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
-
-            // Bilibili
             const bvMatch = url.match(/bilibili\.com\/video\/(BV[A-Za-z0-9]+)/);
             if (bvMatch) return `https://player.bilibili.com/player.html?bvid=${bvMatch[1]}&autoplay=1`;
-
             const avMatch = url.match(/bilibili\.com\/video\/av(\d+)/);
             if (avMatch) return `https://player.bilibili.com/player.html?aid=${avMatch[1]}&autoplay=1`;
-
-            // 其他直接嵌入
             return url;
         }
-
         function loadUrl() {
             const raw = viewerUrlInput.value.trim();
             if (!raw) return;
-            const embed = toEmbedUrl(raw);
-            viewerFrame.src = embed;
+            viewerFrame.src = toEmbedUrl(raw);
             viewerFrame.style.display = 'block';
             viewerPlaceholder.style.display = 'none';
         }
 
-        openBtn.addEventListener('click', openViewer);
-        closeBtn.addEventListener('click', closeViewer);
+        document.getElementById('open-viewer-btn').addEventListener('click', openViewer);
+        document.getElementById('viewer-close-btn').addEventListener('click', closeViewer);
         viewerOverlay.addEventListener('click', closeViewer);
-        goBtn.addEventListener('click', loadUrl);
+        document.getElementById('viewer-go-btn').addEventListener('click', loadUrl);
         viewerUrlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadUrl(); });
-
-        // ── 启动 ──
-        window.addEventListener('DOMContentLoaded', () => {
-            const pet = new DesktopPet();
-            window._pet = pet;
-
-            setInterval(() => {
-                if (Math.random() < 0.3) pet.speak();
-            }, 20000);
-        });
     </script>
 </body>
 </html>
