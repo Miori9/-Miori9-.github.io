@@ -156,13 +156,6 @@
     // 预加载所有图片，避免 GitHub Pages CDN 首帧加载慢导致动画卡帧
     const _allFrames = Object.values(ANIMATIONS).flat();
     _allFrames.forEach(src => { const img = new Image(); img.src = src; });
-        default:   ['default.png'],
-        catch:     ['catch1.png', 'catch-left.png', 'catch-right.png'],
-        cry:       ['cry-1.png', 'cry-2.png', 'cry-3.png', 'cry-4.png'],
-        sleep:     ['sleep1.png', 'sleep2.png', 'sleep3.png', 'sleep4.png', 'sleep5.png', 'sleep6.png'],
-        walk:      ['walk1.png', 'walk2.png', 'walk3.png', 'walk4.png'],
-        walkRight: ['walk-right1.png', 'walk-right2.png', 'walk-right3.png', 'walk-right4.png'],
-    };
 
     const SPEECHES = [
         "早上好！", "你是我的妈妈",
