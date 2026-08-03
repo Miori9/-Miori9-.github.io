@@ -395,6 +395,7 @@
             clearTimeout(this.loopEndTimer);     this.loopEndTimer     = null;
             clearInterval(this.walkInterval);    this.walkInterval     = null;
             this.isWalking = false;
+            this.loopEndAt = null; // 时间戳：循环动作应在何时结束
         }
 
         returnToIdle() {
@@ -428,6 +429,13 @@
             clearTimeout(this.behaviorTimer);
             const d = CONFIG.idleTimeMin + Math.random() * (CONFIG.idleTimeMax - CONFIG.idleTimeMin);
             this.behaviorTimer = setTimeout(() => this.randomBehavior(), d);
+        }
+
+        // 页面重新可见时调用：检查是否卡在 sleep/cry 且超时
+        checkStuck() {
+            if (this.loopEndAt && Date.now() >= this.loopEndAt) {
+                this.returnToIdle();
+            }
         }
 
         randomBehavior() {
@@ -480,6 +488,7 @@
             this.currentAnimation = 'sleep';
             this.playSequence(ANIMATIONS.sleep, 833, () => {
                 this.playLoop(['sleep4.png', 'sleep5.png', 'sleep6.png'], 500);
+                this.loopEndAt = Date.now() + CONFIG.sleepLoopDuration;
                 this.loopEndTimer = setTimeout(() => this.returnToIdle(), CONFIG.sleepLoopDuration);
             });
         }
@@ -489,6 +498,7 @@
             this.currentAnimation = 'cry';
             this.playSequence(ANIMATIONS.cry, 1250, () => {
                 this.playLoop(['cry-3.png', 'cry-4.png'], 600);
+                this.loopEndAt = Date.now() + CONFIG.cryLoopDuration;
                 this.loopEndTimer = setTimeout(() => this.returnToIdle(), CONFIG.cryLoopDuration);
             });
         }
@@ -594,6 +604,13 @@
         setInterval(() => {
             pets.forEach(p => { if (Math.random() < 0.15) p.speak(); });
         }, 20000);
+
+        // 页面重新可见时：检查所有宠物是否卡住
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                pets.forEach(p => p.checkStuck());
+            }
+        });
 
         document.getElementById('add-pet-btn').addEventListener('click', spawnPet);
         document.getElementById('add-win-btn').addEventListener('click', () => new FloatWindow());
