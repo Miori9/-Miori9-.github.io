@@ -213,7 +213,13 @@
 
             this.placeholder = document.createElement('div');
             this.placeholder.className = 'float-win-placeholder';
-            this.placeholder.innerHTML = '<div style="font-size:36px">🌐</div><div>输入网址后按开始</div>';
+            this.placeholder.innerHTML = `
+                <div style="font-size:36px">🌐</div>
+                <div style="font-size:13px;color:#888;text-align:center;line-height:1.8">
+                    支持嵌入的链接：<br>
+                    🎬 YouTube &nbsp;·&nbsp; 📺 Bilibili<br>
+                    <span style="font-size:11px;color:#666">（大多数网站因安全策略禁止嵌入）</span>
+                </div>`;
 
             this.frame = document.createElement('iframe');
             this.frame.className = 'float-win-frame';
@@ -239,14 +245,42 @@
             const raw = this.input.value.trim();
             if (!raw) return;
             let url = raw.startsWith('http') ? raw : 'https://' + raw;
+
+            // YouTube → embed
             const ytM = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-            if (ytM) url = `https://www.youtube.com/embed/${ytM[1]}?autoplay=1`;
+            if (ytM) { this._showEmbed(`https://www.youtube.com/embed/${ytM[1]}?autoplay=1`, 'YouTube'); return; }
+            // Bilibili BV
             const bvM = url.match(/bilibili\.com\/video\/(BV[A-Za-z0-9]+)/);
-            if (bvM) url = `https://player.bilibili.com/player.html?bvid=${bvM[1]}&autoplay=1`;
-            this.frame.src = url;
+            if (bvM) { this._showEmbed(`https://player.bilibili.com/player.html?bvid=${bvM[1]}&autoplay=1`, 'Bilibili'); return; }
+            // Bilibili AV
+            const avM = url.match(/bilibili\.com\/video\/av(\d+)/);
+            if (avM) { this._showEmbed(`https://player.bilibili.com/player.html?aid=${avM[1]}&autoplay=1`, 'Bilibili'); return; }
+            // 其他链接：提示不支持，不跳转
+            this._showUnsupported(url);
+        }
+
+        _showEmbed(embedUrl, label) {
+            this.frame.src = embedUrl;
             this.frame.style.display = 'block';
             this.placeholder.style.display = 'none';
-            try { this.titleEl.textContent = new URL(url.startsWith('http') ? url : 'https://'+url).hostname; } catch(e) {}
+            this.titleEl.textContent = label;
+        }
+
+        _showUnsupported(url) {
+            this.frame.style.display = 'none';
+            this.placeholder.style.display = 'flex';
+            let hostname = url;
+            try { hostname = new URL(url).hostname; } catch(e) {}
+            this.placeholder.innerHTML = `
+                <div style="font-size:32px">🚫</div>
+                <div style="font-size:13px;color:#ccc;text-align:center;line-height:1.8">
+                    <b>${hostname}</b> 不支持嵌入显示<br>
+                    <span style="font-size:11px;color:#888">该网站禁止在窗口内打开</span>
+                </div>
+                <div style="font-size:11px;color:#666;text-align:center;margin-top:4px;line-height:1.8">
+                    ✅ 支持：YouTube、Bilibili
+                </div>`;
+            this.titleEl.textContent = '不支持嵌入';
         }
 
         _setupDrag() {
