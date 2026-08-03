@@ -535,52 +535,33 @@
         _setupDrag() {
             let sx, sy, ix, iy;
 
-            const startDrag = (cx, cy) => {
+            // 鼠标拖动
+            this.container.addEventListener('mousedown', e => {
+                if (e.button !== 0) return;
                 this.isDragging = true;
                 this.clearAll();
                 this.currentAnimation = 'catch';
                 this.playLoop(ANIMATIONS.catch, CONFIG.frameRate);
-                sx = cx; sy = cy; ix = this.x; iy = this.y;
+                sx = e.clientX; sy = e.clientY; ix = this.x; iy = this.y;
                 this.container.classList.add('dragging');
-            };
-            const moveDrag = (cx, cy) => {
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', e => {
                 if (!this.isDragging) return;
-                this.x = ix + cx - sx;
-                this.y = iy + cy - sy;
+                this.x = ix + e.clientX - sx;
+                this.y = iy + e.clientY - sy;
                 this.updatePosition();
-            };
-            const endDrag = () => {
+            });
+            document.addEventListener('mouseup', () => {
                 if (!this.isDragging) return;
                 this.isDragging = false;
                 this.container.classList.remove('dragging');
                 this.returnToIdle();
-            };
-
-            // 鼠标
-            this.container.addEventListener('mousedown', e => {
-                if (e.button !== 0) return;
-                startDrag(e.clientX, e.clientY);
-                e.preventDefault();
             });
-            document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-            document.addEventListener('mouseup', endDrag);
-
-            // 触摸
-            this.container.addEventListener('touchstart', e => {
-                const t = e.touches[0];
-                startDrag(t.clientX, t.clientY);
-                e.preventDefault(); // 阻止长按选图、页面滚动
-            }, { passive: false });
-            this.container.addEventListener('touchmove', e => {
-                const t = e.touches[0];
-                moveDrag(t.clientX, t.clientY);
-                e.preventDefault();
-            }, { passive: false });
-            this.container.addEventListener('touchend', endDrag);
         }
 
         _setupClick() {
-            // 鼠标点击
+            // 鼠标单击
             this.container.addEventListener('click', () => {
                 if (this.isDragging) return;
                 if (this.currentAnimation === 'sleep' || this.currentAnimation === 'cry') {
@@ -591,32 +572,58 @@
             });
             this.container.addEventListener('dblclick', () => this.speak());
 
-            // 触摸单击（touchend 且移动距离小）
-            let touchStartX, touchStartY, touchStartTime;
+            // 触摸：统一在这里处理拖动 + 单击 + 双击
+            let tx0, ty0, startX, startY, startIX, startIY, moved = false;
             this.container.addEventListener('touchstart', e => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-                touchStartTime = Date.now();
-            }, { passive: true });
+                const t = e.touches[0];
+                tx0 = t.clientX; ty0 = t.clientY;
+                startX = t.clientX; startY = t.clientY;
+                startIX = this.x; startIY = this.y;
+                moved = false;
+                e.preventDefault();
+            }, { passive: false });
+
+            this.container.addEventListener('touchmove', e => {
+                const t = e.touches[0];
+                const dx = t.clientX - tx0, dy = t.clientY - ty0;
+                if (!moved && (Math.abs(t.clientX - startX) > 8 || Math.abs(t.clientY - startY) > 8)) {
+                    // 开始拖动
+                    moved = true;
+                    this.isDragging = true;
+                    this.clearAll();
+                    this.currentAnimation = 'catch';
+                    this.playLoop(ANIMATIONS.catch, CONFIG.frameRate);
+                    this.container.classList.add('dragging');
+                }
+                if (this.isDragging) {
+                    this.x = startIX + (t.clientX - startX);
+                    this.y = startIY + (t.clientY - startY);
+                    this.updatePosition();
+                }
+                e.preventDefault();
+            }, { passive: false });
+
             this.container.addEventListener('touchend', e => {
-                if (this.isDragging) return;
-                const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
-                const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
-                const dt = Date.now() - touchStartTime;
-                // 移动小于10px 且时间小于300ms 视为单击
-                if (dx < 10 && dy < 10 && dt < 300) {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.container.classList.remove('dragging');
+                    this.returnToIdle();
+                } else if (!moved) {
+                    // 单击
                     if (this.currentAnimation === 'sleep' || this.currentAnimation === 'cry') {
                         this.returnToIdle();
                     } else {
                         this.cry();
                     }
+                    // 双击检测
+                    if (this._lastTap && Date.now() - this._lastTap < 400) {
+                        this.speak();
+                    }
+                    this._lastTap = Date.now();
                 }
-                // 双击（300ms内第二次）
-                if (dx < 10 && dy < 10 && dt < 300 && this._lastTap && Date.now() - this._lastTap < 400) {
-                    this.speak();
-                }
-                this._lastTap = Date.now();
-            });
+                moved = false;
+                e.preventDefault();
+            }, { passive: false });
         }
 
         updatePosition() {
