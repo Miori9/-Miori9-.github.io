@@ -453,8 +453,11 @@
         walkFree() {
             const angle = Math.random() * Math.PI * 2;
             const dist  = 120 + Math.random() * 250;
-            const tx = this.x + Math.cos(angle) * dist;
-            const ty = this.y + Math.sin(angle) * dist;
+            let tx = this.x + Math.cos(angle) * dist;
+            let ty = this.y + Math.sin(angle) * dist;
+            // 限制目标点在屏幕内，避免卡在墙角
+            tx = Math.max(0, Math.min(tx, window.innerWidth - 150));
+            ty = Math.max(0, Math.min(ty, window.innerHeight - 150));
             this._walkTo(tx, ty);
         }
 
