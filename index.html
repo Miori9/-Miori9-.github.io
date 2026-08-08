@@ -205,7 +205,7 @@
             this.element.style.width = 'auto';
             this.element.style.cursor = 'grab';
             this.element.style.opacity = '0.6';
-            this.element.style.zIndex = '9998';
+            this.element.style.zIndex = '10000';
             this.element.style.pointerEvents = 'auto';
             this.element.style.userSelect = 'none';
             this.element.style.webkitUserDrag = 'none';
@@ -879,8 +879,19 @@
                     clearInterval(this.walkInterval);
                     this.returnToIdle();
                 } else {
-                    this.x += nx * CONFIG.chaseSpeed;
-                    this.y += ny * CONFIG.chaseSpeed;
+                    // Recalculate direction each frame for dynamic tracking
+                    const rnx = rdx / rem;
+                    const rny = rdy / rem;
+
+                    // Update animation if direction changed significantly
+                    const newAnim = rnx >= 0 ? 'walkRight' : 'walk';
+                    if (newAnim !== this.currentAnimation) {
+                        this.currentAnimation = newAnim;
+                        this.playLoop(ANIMATIONS[newAnim], CONFIG.frameRate);
+                    }
+
+                    this.x += rnx * CONFIG.chaseSpeed;
+                    this.y += rny * CONFIG.chaseSpeed;
                     this.updatePosition();
                 }
             }, CONFIG.movementInterval);
@@ -1016,12 +1027,20 @@
 
         document.getElementById('add-pet-btn').addEventListener('click', spawnPet);
         document.getElementById('add-win-btn').addEventListener('click', () => new FloatWindow());
-        document.getElementById('summon-hand-btn').addEventListener('click', () => {
+        const handBtn = document.getElementById('summon-hand-btn');
+        handBtn.addEventListener('click', () => {
             if (window.motherHand) {
-                alert('手已存在，请移动现有的手');
-                return;
+                // Remove hand
+                window.motherHand.remove();
+                window.motherHand = null;
+                handBtn.textContent = '🤚';
+                handBtn.title = '召唤妈妈的手';
+            } else {
+                // Add hand
+                window.motherHand = new HandObject();
+                handBtn.textContent = '❌';
+                handBtn.title = '移除妈妈的手';
             }
-            window.motherHand = new HandObject();
         });
     });
     </script>
