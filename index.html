@@ -150,7 +150,8 @@
         chargeChance: 0.3,       // 30% trigger probability
         windowDetectRange: 200,  // Window detection distance (px)
         handArriveRange: 30,     // Hand arrival threshold (px)
-        handTrackInterval: 100   // Hand tracking check interval (ms)
+        handTrackInterval: 100,  // Hand tracking check interval (ms)
+        movementInterval: 30     // Movement update interval (ms)
     };
 
     const ANIMATIONS = {
@@ -838,7 +839,7 @@
             const dy = ty - this.y;
             const len = Math.sqrt(dx * dx + dy * dy);
 
-            if (len < 5) {
+            if (len < CONFIG.handArriveRange) {
                 this.handArrived = true;
                 this.isChasing = false;
                 return;
@@ -882,7 +883,7 @@
                     this.y += ny * CONFIG.chaseSpeed;
                     this.updatePosition();
                 }
-            }, 30);
+            }, CONFIG.movementInterval);
         }
 
         detectNearbyWindows() {
@@ -932,42 +933,43 @@
             const nx = dx / len;
             const ny = dy / len;
 
-            // Use walk animation (charge at double speed)
-            const anim = nx >= 0 ? 'walkRight' : 'walk';
-            this.isWalking = true;
-            this.currentAnimation = anim;
-            this.playLoop(ANIMATIONS[anim], CONFIG.frameRate);
+            // Preparation phase: show '!' and wait 500ms before charging
+            this.speak('！');
+            setTimeout(() => {
+                // Use walk animation (charge at double speed)
+                const anim = nx >= 0 ? 'walkRight' : 'walk';
+                this.isWalking = true;
+                this.currentAnimation = anim;
+                this.playLoop(ANIMATIONS[anim], CONFIG.frameRate);
 
-            clearInterval(this.walkInterval);
-            this.walkInterval = setInterval(() => {
-                if (!this.isWalking) {
-                    clearInterval(this.walkInterval);
-                    return;
-                }
+                clearInterval(this.walkInterval);
+                this.walkInterval = setInterval(() => {
+                    if (!this.isWalking) {
+                        clearInterval(this.walkInterval);
+                        return;
+                    }
 
-                const rdx = tx - this.x;
-                const rdy = ty - this.y;
-                const rem = Math.sqrt(rdx * rdx + rdy * rdy);
+                    const rdx = tx - this.x;
+                    const rdy = ty - this.y;
+                    const rem = Math.sqrt(rdx * rdx + rdy * rdy);
 
-                if (rem < CONFIG.chargeSpeed) {
-                    this.x = tx;
-                    this.y = ty;
-                    clearInterval(this.walkInterval);
-                    this.isWalking = false;
-                    this._interactWithWindow(win, nx, ny);
-                    this.returnToIdle();
-                } else {
-                    this.x += nx * CONFIG.chargeSpeed;
-                    this.y += ny * CONFIG.chargeSpeed;
-                    this.updatePosition();
-                }
-            }, 30);
+                    if (rem < CONFIG.chargeSpeed) {
+                        this.x = tx;
+                        this.y = ty;
+                        clearInterval(this.walkInterval);
+                        this.isWalking = false;
+                        this._interactWithWindow(win, nx, ny);
+                        this.returnToIdle();
+                    } else {
+                        this.x += nx * CONFIG.chargeSpeed;
+                        this.y += ny * CONFIG.chargeSpeed;
+                        this.updatePosition();
+                    }
+                }, CONFIG.movementInterval);
+            }, 500);
         }
 
         _interactWithWindow(win, dirX, dirY) {
-            // Show "!" dialog before interaction
-            this.speak('！');
-
             // 50% push window, 50% bounce back
             if (Math.random() < 0.5) {
                 // Push window in a random direction
