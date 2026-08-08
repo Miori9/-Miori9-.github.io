@@ -177,6 +177,110 @@
     }
 
     // ════════════════════════════════
+    //  妈妈的手
+    // ════════════════════════════════
+    class HandObject {
+        constructor() {
+            this.element = null;
+            this.x = window.innerWidth / 2;
+            this.y = window.innerHeight / 2;
+            this.isDragging = false;
+            this.isPlaced = false;
+            this.init();
+        }
+
+        init() {
+            // Create DOM element
+            this.element = document.createElement('img');
+            this.element.src = 'IMG_9117.PNG';
+            this.element.style.position = 'fixed';
+            this.element.style.height = '90px';
+            this.element.style.width = 'auto';
+            this.element.style.cursor = 'grab';
+            this.element.style.opacity = '0.6';
+            this.element.style.zIndex = '9998';
+            this.element.style.pointerEvents = 'auto';
+            this.element.style.userSelect = 'none';
+            this.element.style.webkitUserDrag = 'none';
+
+            document.body.appendChild(this.element);
+            this._updatePosition();
+
+            // Start dragging immediately on creation
+            this.isDragging = true;
+            this.element.style.cursor = 'grabbing';
+
+            // Bind events
+            this.element.addEventListener('mousedown', (e) => this._onMouseDown(e));
+            document.addEventListener('mousemove', (e) => this._onMouseMove(e));
+            document.addEventListener('mouseup', (e) => this._onMouseUp(e));
+        }
+
+        _onMouseDown(e) {
+            if (!this.isPlaced) return; // Already dragging on first placement
+            e.preventDefault();
+            this.isDragging = true;
+            this.element.style.cursor = 'grabbing';
+            this.element.style.opacity = '0.6';
+        }
+
+        _onMouseMove(e) {
+            if (!this.isDragging) return;
+            this.moveTo(e.clientX - 45, e.clientY - 45); // Center on cursor
+        }
+
+        _onMouseUp(e) {
+            if (!this.isDragging) return;
+            this.endDrag();
+        }
+
+        moveTo(x, y) {
+            this.x = Math.max(0, Math.min(x, window.innerWidth - 90));
+            this.y = Math.max(0, Math.min(y, window.innerHeight - 90));
+            this._updatePosition();
+
+            // Notify pets that hand moved
+            if (this.isPlaced) {
+                pets.forEach(pet => {
+                    if (pet.handArrived) {
+                        pet.handArrived = false;
+                    }
+                });
+            }
+        }
+
+        _updatePosition() {
+            this.element.style.left = this.x + 'px';
+            this.element.style.top = this.y + 'px';
+        }
+
+        endDrag() {
+            this.isDragging = false;
+            this.isPlaced = true;
+            this.element.style.cursor = 'grab';
+            this.element.style.opacity = '1.0';
+
+            // Start all pets tracking
+            pets.forEach(pet => pet._startHandTracking());
+        }
+
+        remove() {
+            // Clean up all pet tracking
+            pets.forEach(pet => {
+                if (pet.handTrackingTimer) {
+                    clearInterval(pet.handTrackingTimer);
+                    pet.handTrackingTimer = null;
+                }
+                pet.isChasing = false;
+                pet.handArrived = false;
+            });
+
+            this.element.remove();
+            window.motherHand = null;
+        }
+    }
+
+    // ════════════════════════════════
     //  浮动窗口
     // ════════════════════════════════
     class FloatWindow {
