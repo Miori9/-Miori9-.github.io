@@ -925,7 +925,7 @@
             const len = Math.sqrt(dx * dx + dy * dy);
 
             if (len < 5) {
-                this._pushWindow(win);
+                this._interactWithWindow(win, dx / Math.max(len, 0.01), dy / Math.max(len, 0.01));
                 return;
             }
 
@@ -954,7 +954,7 @@
                     this.y = ty;
                     clearInterval(this.walkInterval);
                     this.isWalking = false;
-                    this._pushWindow(win);
+                    this._interactWithWindow(win, nx, ny);
                     this.returnToIdle();
                 } else {
                     this.x += nx * CONFIG.chargeSpeed;
@@ -964,12 +964,24 @@
             }, 30);
         }
 
-        _pushWindow(win) {
-            // Push window in a random direction
-            const angle = Math.random() * Math.PI * 2;
-            const pushDist = 60 + Math.random() * 100;
-            win.nudge(Math.cos(angle) * pushDist, Math.sin(angle) * pushDist);
+        _interactWithWindow(win, dirX, dirY) {
+            // Show "!" dialog before interaction
             this.speak('！');
+
+            // 50% push window, 50% bounce back
+            if (Math.random() < 0.5) {
+                // Push window in a random direction
+                const angle = Math.random() * Math.PI * 2;
+                const pushDist = 60 + Math.random() * 100;
+                win.nudge(Math.cos(angle) * pushDist, Math.sin(angle) * pushDist);
+            } else {
+                // Bounce back in opposite direction and cry
+                const bounceDistance = 50 + Math.random() * 30; // 50-80px
+                this.x -= dirX * bounceDistance;
+                this.y -= dirY * bounceDistance;
+                this.updatePosition();
+                this.cry();
+            }
         }
 
         destroy() { this.clearAll(); this._stopHandTracking(); this.container.remove(); }
