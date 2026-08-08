@@ -186,6 +186,9 @@
             this.y = window.innerHeight / 2;
             this.isDragging = false;
             this.isPlaced = false;
+            // Store bound handlers for cleanup
+            this._boundMouseMove = null;
+            this._boundMouseUp = null;
             this.init();
         }
 
@@ -210,10 +213,12 @@
             this.isDragging = true;
             this.element.style.cursor = 'grabbing';
 
-            // Bind events
+            // Bind events with stored references for cleanup
+            this._boundMouseMove = (e) => this._onMouseMove(e);
+            this._boundMouseUp = (e) => this._onMouseUp(e);
             this.element.addEventListener('mousedown', (e) => this._onMouseDown(e));
-            document.addEventListener('mousemove', (e) => this._onMouseMove(e));
-            document.addEventListener('mouseup', (e) => this._onMouseUp(e));
+            document.addEventListener('mousemove', this._boundMouseMove);
+            document.addEventListener('mouseup', this._boundMouseUp);
         }
 
         _onMouseDown(e) {
@@ -226,7 +231,9 @@
 
         _onMouseMove(e) {
             if (!this.isDragging) return;
-            this.moveTo(e.clientX - 45, e.clientY - 45); // Center on cursor
+            // Calculate offset based on actual element dimensions
+            const rect = this.element.getBoundingClientRect();
+            this.moveTo(e.clientX - rect.width / 2, e.clientY - rect.height / 2);
         }
 
         _onMouseUp(e) {
@@ -235,8 +242,10 @@
         }
 
         moveTo(x, y) {
-            this.x = Math.max(0, Math.min(x, window.innerWidth - 90));
-            this.y = Math.max(0, Math.min(y, window.innerHeight - 90));
+            // Get actual element dimensions for boundary clamping
+            const rect = this.element.getBoundingClientRect();
+            this.x = Math.max(0, Math.min(x, window.innerWidth - rect.width));
+            this.y = Math.max(0, Math.min(y, window.innerHeight - rect.height));
             this._updatePosition();
 
             // Notify pets that hand moved
@@ -274,6 +283,14 @@
                 pet.isChasing = false;
                 pet.handArrived = false;
             });
+
+            // Remove event listeners to prevent memory leaks
+            if (this._boundMouseMove) {
+                document.removeEventListener('mousemove', this._boundMouseMove);
+            }
+            if (this._boundMouseUp) {
+                document.removeEventListener('mouseup', this._boundMouseUp);
+            }
 
             this.element.remove();
             window.motherHand = null;
