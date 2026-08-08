@@ -220,9 +220,15 @@
             // Bind events with stored references for cleanup
             this._boundMouseMove = (e) => this._onMouseMove(e);
             this._boundMouseUp = (e) => this._onMouseUp(e);
+            this._boundTouchMove = (e) => this._onTouchMove(e);
+            this._boundTouchEnd = (e) => this._onTouchEnd(e);
+
             this.element.addEventListener('mousedown', (e) => this._onMouseDown(e));
+            this.element.addEventListener('touchstart', (e) => this._onTouchStart(e), { passive: false });
             document.addEventListener('mousemove', this._boundMouseMove);
             document.addEventListener('mouseup', this._boundMouseUp);
+            document.addEventListener('touchmove', this._boundTouchMove, { passive: false });
+            document.addEventListener('touchend', this._boundTouchEnd);
         }
 
         _onMouseDown(e) {
@@ -233,6 +239,13 @@
             this.element.style.opacity = '0.6';
         }
 
+        _onTouchStart(e) {
+            if (!this.isPlaced) return; // Already dragging on first placement
+            e.preventDefault();
+            this.isDragging = true;
+            this.element.style.opacity = '0.6';
+        }
+
         _onMouseMove(e) {
             if (!this.isDragging) return;
             // Calculate offset based on actual element dimensions
@@ -240,7 +253,20 @@
             this.moveTo(e.clientX - rect.width / 2, e.clientY - rect.height / 2);
         }
 
+        _onTouchMove(e) {
+            if (!this.isDragging) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = this.element.getBoundingClientRect();
+            this.moveTo(touch.clientX - rect.width / 2, touch.clientY - rect.height / 2);
+        }
+
         _onMouseUp(e) {
+            if (!this.isDragging) return;
+            this.endDrag();
+        }
+
+        _onTouchEnd(e) {
             if (!this.isDragging) return;
             this.endDrag();
         }
@@ -294,6 +320,12 @@
             }
             if (this._boundMouseUp) {
                 document.removeEventListener('mouseup', this._boundMouseUp);
+            }
+            if (this._boundTouchMove) {
+                document.removeEventListener('touchmove', this._boundTouchMove);
+            }
+            if (this._boundTouchEnd) {
+                document.removeEventListener('touchend', this._boundTouchEnd);
             }
 
             this.element.remove();
