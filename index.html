@@ -113,6 +113,8 @@
         #add-pet-btn  { background: #2e7d32; }
         #add-pet-btn:hover  { background: #1b5e20; }
         #add-pet-btn:disabled { background: #777; cursor: not-allowed; transform: none; }
+        #summon-hand-btn { background: #d32f2f; }
+        #summon-hand-btn:hover { background: #b71c1c; }
 
         #pet-count-badge {
             position: fixed; bottom: 72px; right: 20px;
@@ -127,6 +129,7 @@
     <div id="fab-group">
         <button class="fab" id="add-win-btn"  title="新建窗口">🌐</button>
         <button class="fab" id="add-pet-btn"  title="召唤完能（最多20只）">➕</button>
+        <button class="fab" id="summon-hand-btn" title="召唤妈妈的手">🤚</button>
     </div>
     <div id="pet-count-badge">1 / 20</div>
 
@@ -808,6 +811,13 @@
 
         document.getElementById('add-pet-btn').addEventListener('click', spawnPet);
         document.getElementById('add-win-btn').addEventListener('click', () => new FloatWindow());
+        document.getElementById('summon-hand-btn').addEventListener('click', () => {
+            if (window.motherHand) {
+                alert('手已存在，请移动现有的手');
+                return;
+            }
+            window.motherHand = new HandObject();
+        });
     });
     </script>
 </body>
