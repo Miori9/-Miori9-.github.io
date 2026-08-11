@@ -119,7 +119,7 @@ const UnlockSystem = {
         width: 100%;
         height: 100%;
         background: var(--color-red);
-        z-index: 999;
+        z-index: 30000;
         animation: flash 0.1s ease-in-out 3;
       `;
 
@@ -152,7 +152,7 @@ const UnlockSystem = {
 
       // Glitch characters
       const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~';
-      const colors = ['#FFFFFF', 'var(--color-red)'];
+      const colors = ['#FFFFFF', '#FF0000'];
 
       let frame = 0;
       const maxFrames = 30; // ~0.5s at 60fps
