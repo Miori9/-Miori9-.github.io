@@ -1,0 +1,4 @@
+Note: Create a 100x100px noise texture image (noise.png)
+Can use: https://www.noisetexturegenerator.com/
+Or any procedural noise generator
+Grayscale, tileable, film grain style

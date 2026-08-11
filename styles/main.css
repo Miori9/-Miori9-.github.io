@@ -84,3 +84,77 @@ body {
   opacity: 0;
   z-index: 100;
 }
+
+#wallpaper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--z-wallpaper);
+  background: var(--color-black);
+  overflow: hidden;
+}
+
+.wallpaper-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#wallpaper-base {
+  background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+}
+
+#wallpaper-collage {
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+#wallpaper-noise {
+  opacity: 0.05;
+  background-image: url('../assets/textures/noise.png');
+  background-repeat: repeat;
+  animation: noiseScroll 2s linear infinite;
+}
+
+@keyframes noiseScroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 100px 100px; }
+}
+
+#wallpaper-scanline {
+  height: 2px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  animation: scanlineMove 8s linear infinite;
+}
+
+@keyframes scanlineMove {
+  0% { transform: translateY(-2px); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Collage elements */
+.collage-element {
+  position: absolute;
+  opacity: 0.2;
+  pointer-events: none;
+  transition: transform 0.3s ease-out;
+}
+
+.collage-shape {
+  border: 1px solid #444444;
+}
+
+.collage-text {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #444444;
+  white-space: nowrap;
+  overflow: hidden;
+  transform: rotate(-5deg);
+}
