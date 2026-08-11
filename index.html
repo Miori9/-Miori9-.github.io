@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dreamcore Workspace</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/animations.css">
+  <link rel="stylesheet" href="styles/horror-effects.css">
+</head>
+<body>
+  <!-- Unlock Layer -->
+  <div id="unlock-layer" class="layer">
+    <div id="eye-container">
+      <img id="eye-image" src="assets/images/eye-open.png" alt="eye">
+    </div>
+    <canvas id="glitch-canvas"></canvas>
+  </div>
+
+  <!-- Desktop Layer (initially hidden) -->
+  <div id="desktop-layer" class="layer hidden">
+    <div id="wallpaper"></div>
+    <div id="windows-container"></div>
+    <div id="dock"></div>
+  </div>
+
+  <script src="scripts/core.js"></script>
+</body>
+</html>
