@@ -112,7 +112,7 @@ const UnlockSystem = {
   async showSewnEye() {
     return new Promise(resolve => {
       // Switch image
-      this.eyeImage.src = 'assets/images/eye-sewn.png';
+      this.eyeImage.src = 'assets/images/eye-sewn.svg';
 
       // Sewing animation (if we had it)
       setTimeout(resolve, 500);

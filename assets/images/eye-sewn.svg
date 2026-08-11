@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Eye white background -->
+  <ellipse cx="100" cy="100" rx="80" ry="60" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+  
+  <!-- Sewn shut lines (X pattern) -->
+  <line x1="40" y1="85" x2="160" y2="115" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+  <line x1="40" y1="115" x2="160" y2="85" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Stitches -->
+  <circle cx="60" cy="95" r="3" fill="#000"/>
+  <circle cx="80" cy="100" r="3" fill="#000"/>
+  <circle cx="100" cy="100" r="3" fill="#000"/>
+  <circle cx="120" cy="100" r="3" fill="#000"/>
+  <circle cx="140" cy="105" r="3" fill="#000"/>
+</svg>
