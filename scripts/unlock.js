@@ -84,7 +84,10 @@ const UnlockSystem = {
 
   startUnlockSequence() {
     console.log('Unlock sequence started');
-    // Will be implemented in next task
+    // Transition to desktop layer
+    if (window.WorkspaceCore && window.WorkspaceCore.showLayer) {
+      window.WorkspaceCore.showLayer('desktop');
+    }
   }
 };
 
