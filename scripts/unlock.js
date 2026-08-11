@@ -82,12 +82,127 @@ const UnlockSystem = {
     this.startUnlockSequence();
   },
 
-  startUnlockSequence() {
+  async startUnlockSequence() {
     console.log('Unlock sequence started');
-    // Transition to desktop layer
-    if (window.WorkspaceCore && window.WorkspaceCore.showLayer) {
-      window.WorkspaceCore.showLayer('desktop');
-    }
+
+    // Phase 1: Switch to sewn eye
+    await this.showSewnEye();
+
+    // Phase 2: Red flash
+    await this.redFlash();
+
+    // Phase 3: Glitch effects
+    await this.glitchEffect();
+
+    // Phase 4: Reveal desktop
+    await this.revealDesktop();
+  },
+
+  async showSewnEye() {
+    return new Promise(resolve => {
+      // Switch image
+      this.eyeImage.src = 'assets/images/eye-sewn.png';
+
+      // Sewing animation (if we had it)
+      setTimeout(resolve, 500);
+    });
+  },
+
+  async redFlash() {
+    return new Promise(resolve => {
+      const flashOverlay = document.createElement('div');
+      flashOverlay.id = 'flash-overlay';
+      flashOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #FF0000;
+        z-index: 9998;
+        animation: flash 0.1s ease-in-out 3;
+      `;
+
+      document.body.appendChild(flashOverlay);
+
+      setTimeout(() => {
+        flashOverlay.remove();
+        resolve();
+      }, 300);
+    });
+  },
+
+  async glitchEffect() {
+    return new Promise(resolve => {
+      const canvas = document.getElementById('glitch-canvas');
+      if (!canvas) {
+        resolve();
+        return;
+      }
+
+      canvas.style.opacity = '1';
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Glitch characters
+      const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~';
+      const colors = ['#FFFFFF', '#FF0000'];
+
+      let frame = 0;
+      const maxFrames = 30; // ~0.5s at 60fps
+
+      const drawGlitch = () => {
+        if (frame >= maxFrames) {
+          canvas.style.opacity = '0';
+          resolve();
+          return;
+        }
+
+        // Clear with slight fade
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw random characters
+        for (let i = 0; i < 50; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          const color = colors[Math.floor(Math.random() * colors.length)];
+
+          ctx.fillStyle = color;
+          ctx.font = `${20 + Math.random() * 30}px monospace`;
+          ctx.fillText(char, x, y);
+        }
+
+        frame++;
+        requestAnimationFrame(drawGlitch);
+      };
+
+      drawGlitch();
+    });
+  },
+
+  async revealDesktop() {
+    return new Promise(resolve => {
+      // Add shake effect to unlock layer
+      const unlockLayer = document.getElementById('unlock-layer');
+      unlockLayer.style.animation = 'shake 0.3s ease-in-out';
+
+      setTimeout(() => {
+        // Fade out unlock layer
+        unlockLayer.style.transition = 'opacity 1s ease-out';
+        unlockLayer.style.opacity = '0';
+
+        setTimeout(() => {
+          WorkspaceCore.showLayer('desktop');
+          WorkspaceCore.state.isLocked = false;
+          unlockLayer.style.opacity = '1';
+          unlockLayer.style.animation = '';
+          resolve();
+        }, 1000);
+      }, 300);
+    });
   }
 };
 
