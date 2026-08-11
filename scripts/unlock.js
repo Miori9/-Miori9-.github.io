@@ -24,9 +24,20 @@ const UnlockSystem = {
     // Click to unlock
     this.eyeContainer.addEventListener('click', this.handleEyeClick.bind(this));
 
-    // Touch support
-    this.eyeContainer.addEventListener('touchstart', this.handleEyeClick.bind(this), {passive: false});
-    document.addEventListener('touchmove', this.handleTouchMove.bind(this), {passive: false});
+    // Touch support - improved
+    this.eyeContainer.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      this.handleEyeClick(e);
+    }, {passive: false});
+
+    document.addEventListener('touchmove', (e) => {
+      this.handleTouchMove(e);
+    }, {passive: true}); // passive for better scroll performance
+
+    // Prevent context menu on long press
+    this.eyeContainer.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
   },
 
   handleMouseMove(e) {

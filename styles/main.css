@@ -158,3 +158,58 @@ body {
   overflow: hidden;
   transform: rotate(-5deg);
 }
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  #eye-container {
+    width: 150px;
+    height: 150px;
+  }
+
+  .collage-text {
+    font-size: 10px;
+  }
+}
+
+/* Prevent mobile zoom on double-tap */
+* {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection during interactions */
+#eye-container,
+.collage-element {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  #eye-container {
+    width: 150px;
+    height: 150px;
+  }
+
+  .collage-text {
+    font-size: 10px;
+  }
+}
+
+/* Prevent mobile zoom on double-tap */
+* {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection during interactions */
+#eye-container,
+.collage-element {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Hardware acceleration hints */
+#eye-image,
+#glitch-canvas,
+.wallpaper-layer {
+  will-change: transform, opacity;
+}
