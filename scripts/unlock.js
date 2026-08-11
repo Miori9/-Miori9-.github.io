@@ -118,8 +118,8 @@ const UnlockSystem = {
         left: 0;
         width: 100%;
         height: 100%;
-        background: #FF0000;
-        z-index: 9998;
+        background: var(--color-red);
+        z-index: 999;
         animation: flash 0.1s ease-in-out 3;
       `;
 
@@ -142,12 +142,17 @@ const UnlockSystem = {
 
       canvas.style.opacity = '1';
       const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve();
+        return;
+      }
+
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
       // Glitch characters
       const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~';
-      const colors = ['#FFFFFF', '#FF0000'];
+      const colors = ['#FFFFFF', 'var(--color-red)'];
 
       let frame = 0;
       const maxFrames = 30; // ~0.5s at 60fps
@@ -195,8 +200,10 @@ const UnlockSystem = {
         unlockLayer.style.opacity = '0';
 
         setTimeout(() => {
-          WorkspaceCore.showLayer('desktop');
-          WorkspaceCore.state.isLocked = false;
+          if (window.WorkspaceCore && window.WorkspaceCore.showLayer) {
+            WorkspaceCore.showLayer('desktop');
+            WorkspaceCore.state.isLocked = false;
+          }
           unlockLayer.style.opacity = '1';
           unlockLayer.style.animation = '';
           resolve();
