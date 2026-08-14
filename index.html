@@ -7,13 +7,38 @@
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/animations.css">
   <link rel="stylesheet" href="styles/horror-effects.css">
+  <link rel="stylesheet" href="styles/windows.css">
 </head>
 <body>
-  <!-- Unlock Layer -->
+  <!-- Unlock Layer — macOS-style lock screen -->
   <div id="unlock-layer" class="layer">
-    <div id="eye-container">
-      <img id="eye-image" src="assets/images/eye-open.svg" alt="eye">
+    <div id="lock-screen">
+      <!-- Avatar -->
+      <div id="lock-avatar">
+        <img id="lock-avatar-img" src="assets/images/eye-realistic.png" alt="avatar">
+      </div>
+      <!-- Username — editable with Zalgo corruption overlay -->
+      <div id="lock-username-wrap">
+        <label id="lock-username-label" for="lock-username">Enter Username</label>
+        <input id="lock-username" type="text" value="" placeholder="" spellcheck="false" autocomplete="off">
+        <div id="lock-username-zalgo" aria-hidden="true"></div>
+      </div>
+      <!-- Password field -->
+      <div id="lock-password-wrap">
+        <input id="lock-password" type="password" placeholder="Enter Password" autocomplete="off" spellcheck="false">
+        <button id="lock-submit" aria-label="unlock">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Hint text -->
+      <div id="lock-hint"></div>
     </div>
+    <!-- Scanline across entire lock screen -->
+    <div id="lock-scanline"></div>
+    <!-- Static noise canvas — sanity erosion -->
+    <canvas id="noise-canvas"></canvas>
     <canvas id="glitch-canvas"></canvas>
   </div>
 
@@ -27,5 +52,10 @@
   <script src="scripts/core.js"></script>
   <script src="scripts/unlock.js"></script>
   <script src="scripts/wallpaper.js"></script>
+  <script src="scripts/window-manager.js"></script>
+  <script src="scripts/apps/calendar.js"></script>
+  <script src="scripts/apps/todo.js"></script>
+  <script src="scripts/apps/pomodoro.js"></script>
+  <script src="scripts/dock.js"></script>
 </body>
 </html>

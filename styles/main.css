@@ -41,27 +41,41 @@ body {
 #unlock-layer {
   z-index: 9999;
   background: var(--color-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #desktop-layer {
   z-index: 1;
 }
 
-#eye-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px;
-  height: 200px;
-  cursor: pointer;
+/* ── Lock Screen ── */
+#lock-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  z-index: 1;
 }
 
-#eye-image {
+/* Avatar circle */
+#lock-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: 2px solid #333;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.08);
+}
+
+#lock-avatar-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  transition: transform 0.1s ease-out;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.3) contrast(1.1);
   animation: breathe 4s ease-in-out infinite;
 }
 
@@ -70,8 +84,175 @@ body {
   50% { transform: scale(1.02); }
 }
 
-#eye-image.following {
-  transition: transform 0.05s ease-out;
+/* Username — editable input with Zalgo overlay */
+#lock-username-wrap {
+  position: relative;
+  width: 300px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#lock-username-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  transition: opacity 0.3s;
+  cursor: text;
+}
+
+#lock-username-wrap.has-text #lock-username-label {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+#lock-username {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: transparent;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  outline: none;
+  text-align: center;
+  width: 100%;
+  caret-color: var(--color-red);
+  cursor: text;
+  position: relative;
+  z-index: 2;
+}
+
+#lock-username::selection {
+  background: rgba(255, 0, 0, 0.3);
+  color: var(--color-white);
+}
+
+/* Zalgo corruption layer — visible text, no pointer events */
+#lock-username-zalgo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--color-white);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+  line-height: 2.4;
+}
+
+/* Password wrapper */
+#lock-password-wrap {
+  position: relative;
+  width: 220px;
+  height: 36px;
+}
+
+#lock-password {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 0 40px 0 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  color: var(--color-white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#lock-password::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+}
+
+#lock-password:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
+/* Submit arrow button */
+#lock-submit {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  padding: 0;
+}
+
+#lock-submit:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+}
+
+/* Hint / error text */
+#lock-hint {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  color: var(--color-red);
+  height: 18px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#lock-hint.visible {
+  opacity: 1;
+}
+
+/* Shake animation for wrong password */
+@keyframes lockShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-12px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-8px); }
+  80% { transform: translateX(6px); }
+}
+
+#lock-password-wrap.shake {
+  animation: lockShake 0.4s ease-in-out;
+}
+
+/* Scanline across entire lock screen */
+#lock-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.04);
+  z-index: 2;
+  animation: scanlineMove 8s linear infinite;
+  pointer-events: none;
 }
 
 #glitch-canvas {
@@ -83,6 +264,19 @@ body {
   pointer-events: none;
   opacity: 0;
   z-index: 100;
+}
+
+/* Static noise canvas — TV snow / sanity erosion */
+#noise-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 90;
+  mix-blend-mode: screen;
 }
 
 #wallpaper {
@@ -116,14 +310,6 @@ body {
 
 #wallpaper-noise {
   opacity: 0.05;
-  background-image: url('../assets/textures/noise.png');
-  background-repeat: repeat;
-  animation: noiseScroll 2s linear infinite;
-}
-
-@keyframes noiseScroll {
-  0% { background-position: 0 0; }
-  100% { background-position: 100px 100px; }
 }
 
 #wallpaper-scanline {
@@ -161,9 +347,17 @@ body {
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
-  #eye-container {
-    width: 150px;
-    height: 150px;
+  #lock-avatar {
+    width: 90px;
+    height: 90px;
+  }
+
+  #lock-username {
+    font-size: 18px;
+  }
+
+  #lock-password-wrap {
+    width: 200px;
   }
 
   .collage-text {
@@ -177,38 +371,13 @@ body {
 }
 
 /* Prevent text selection during interactions */
-#eye-container,
-.collage-element {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* Mobile optimizations */
-@media (max-width: 768px) {
-  #eye-container {
-    width: 150px;
-    height: 150px;
-  }
-
-  .collage-text {
-    font-size: 10px;
-  }
-}
-
-/* Prevent mobile zoom on double-tap */
-* {
-  touch-action: manipulation;
-}
-
-/* Prevent text selection during interactions */
-#eye-container,
+#lock-screen,
 .collage-element {
   user-select: none;
   -webkit-user-select: none;
 }
 
 /* Hardware acceleration hints */
-#eye-image,
 #glitch-canvas,
 .wallpaper-layer {
   will-change: transform, opacity;

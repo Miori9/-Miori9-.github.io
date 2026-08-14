@@ -27,16 +27,39 @@ const WallpaperSystem = {
     collageLayer.className = 'wallpaper-layer';
     this.container.appendChild(collageLayer);
 
-    // Noise layer
+    // Noise layer — canvas-generated, no external image needed
     const noiseLayer = document.createElement('div');
     noiseLayer.id = 'wallpaper-noise';
     noiseLayer.className = 'wallpaper-layer';
     this.container.appendChild(noiseLayer);
+    this.generateNoiseTexture(noiseLayer);
 
     // Scanline
     const scanline = document.createElement('div');
     scanline.id = 'wallpaper-scanline';
     this.container.appendChild(scanline);
+  },
+
+  generateNoiseTexture(layer) {
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.createImageData(size, size);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const v = Math.random() * 255;
+      data[i] = v;
+      data[i + 1] = v;
+      data[i + 2] = v;
+      data[i + 3] = 40 + Math.random() * 60;
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+    layer.style.backgroundImage = `url(${canvas.toDataURL()})`;
+    layer.style.backgroundRepeat = 'repeat';
   },
 
   generateCollage() {
