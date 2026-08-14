@@ -161,6 +161,8 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
+  position: relative;
+  overflow: visible;
 }
 
 .dock-item {
@@ -170,6 +172,7 @@
   cursor: pointer;
   transition: transform 0.15s ease-out;
   position: relative;
+  z-index: 1;
   padding: 4px 6px 2px;
 }
 
@@ -512,6 +515,178 @@
 .pomodoro-btn.active {
   border-color: #FF0000;
   color: #FF0000;
+}
+
+/* ── Desktop Pet (sprite-based) ── */
+.pet-container {
+  position: fixed;
+  cursor: move;
+  user-select: none;
+  z-index: 10000;
+  -webkit-touch-callout: none;
+  touch-action: none;
+}
+
+.pet-container.dragging {
+  cursor: grabbing;
+}
+
+.pet-image {
+  display: block;
+  width: 150px;
+  height: auto;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Speech bubble */
+.speech-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 2px solid #333;
+  border-radius: 15px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  min-width: 100px;
+  max-width: 200px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+.speech-bubble.show {
+  opacity: 1;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 10px solid transparent;
+  border-top-color: #333;
+}
+
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: white;
+  z-index: 1;
+  margin-top: -2px;
+}
+
+.speech-text {
+  font-size: 13px;
+  color: #333;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+/* Q弹掉落动画 */
+@keyframes dropBounce {
+  0%   { transform: translateY(-200px) scaleY(1);    opacity: 0; }
+  60%  { transform: translateY(0)      scaleY(1);    opacity: 1; }
+  72%  { transform: translateY(0)      scaleY(0.7);  opacity: 1; }
+  80%  { transform: translateY(-40px)  scaleY(1.1);  opacity: 1; }
+  90%  { transform: translateY(0)      scaleY(0.85); opacity: 1; }
+  96%  { transform: translateY(-10px)  scaleY(1.05); opacity: 1; }
+  100% { transform: translateY(0)      scaleY(1);    opacity: 1; }
+}
+
+.pet-container.dropping {
+  animation: dropBounce 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: bottom center;
+}
+
+/* Settings */
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-heading {
+  font-size: 11px;
+  color: #666;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 13px;
+}
+
+.settings-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid #555;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.settings-toggle input[type="checkbox"]:checked {
+  background: #FF0000;
+  border-color: #FF0000;
+}
+
+.settings-toggle input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -1px;
+  left: 2px;
+  font-size: 12px;
+  color: #000;
+}
+
+.settings-btn {
+  display: block;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #444;
+  color: #999;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  text-align: left;
+  margin-bottom: 6px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.settings-btn:hover {
+  color: #fff;
+  border-color: #666;
+}
+
+.settings-btn.danger {
+  color: #884444;
+}
+
+.settings-btn.danger:hover {
+  color: #FF0000;
+  border-color: #FF0000;
 }
 
 /* ── Mobile ── */

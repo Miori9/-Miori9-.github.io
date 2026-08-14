@@ -29,6 +29,8 @@ const WorkspaceCore = {
       }
     });
     this.state.currentLayer = layerName;
+
+    // Pet init is handled by pet.js MutationObserver
   }
 };
 

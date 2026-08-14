@@ -6,6 +6,10 @@ const DockSystem = {
     { id: 'calendar', icon: '📅', label: 'Calendar' },
     { id: 'todo',     icon: '📝', label: 'Todo List' },
     { id: 'pomodoro', icon: '⏱️', label: 'Pomodoro' },
+    { id: 'oc-gallery', icon: '👤', label: 'OC Gallery' },
+    { id: 'settings', icon: '⚙️', label: 'Settings' },
+    { id: 'pet-spawn', icon: '🐾', label: '召唤完能', special: true },
+    { id: 'pet-hand',  icon: '🤚', label: '妈妈的手', special: true },
   ],
 
   init() {
@@ -69,6 +73,27 @@ const DockSystem = {
   },
 
   launchApp(appId) {
+    // Pet special actions
+    if (appId === 'pet-spawn' && window.PetSystem) {
+      PetSystem.spawnPet();
+      return;
+    }
+    if (appId === 'pet-hand' && window.PetSystem) {
+      const summoned = PetSystem.summonHand();
+      // Update icon to show state
+      const item = this.items.find(i => i.app.id === 'pet-hand');
+      if (item) {
+        const icon = item.el.querySelector('.dock-icon');
+        icon.textContent = summoned ? '❌' : '🤚';
+      }
+      return;
+    }
+
+    // OC Gallery toggles abyss mode
+    if (appId === 'oc-gallery' && window.HorrorMode) {
+      HorrorMode.toggle();
+    }
+
     if (!window.Apps || !Apps[appId]) {
       console.warn(`App "${appId}" not registered`);
       return;

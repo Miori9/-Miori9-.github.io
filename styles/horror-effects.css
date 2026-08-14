@@ -1,9 +1,232 @@
-/* Horror visual effects - to be populated in later tasks */
+/* ── Horror Visual Effects ── */
+/* All abyss mode styles driven by body.abyss ancestor */
 
+/* ── Keyframes ── */
+@keyframes textFlicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.2; }
+  97% { opacity: 0.8; }
+  98% { opacity: 0.1; }
+  99% { opacity: 0.9; }
+}
+
+@keyframes jitter {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, 0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; stroke-width: 4; }
+  50% { opacity: 0.6; stroke-width: 6; }
+}
+
+@keyframes dockEyeFadeIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tearDrip {
+  0% { height: 0; opacity: 0.8; }
+  100% { height: 12px; opacity: 0; }
+}
+
+@keyframes bloodPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.1); }
+  50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
+}
+
+/* ── Wallpaper ── */
+body.abyss #wallpaper-base {
+  background: radial-gradient(circle at center, #1a0505 0%, #0a0000 100%);
+  transition: background 1s ease;
+}
+
+body.abyss #wallpaper-collage {
+  opacity: 0.4;
+  transition: opacity 1s ease;
+}
+
+body.abyss #wallpaper-noise {
+  opacity: 0.08;
+  transition: opacity 1s ease;
+}
+
+/* ── Windows ── */
+body.abyss .window {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.08);
+  border-color: #441111;
+  transition: box-shadow 0.8s ease, border-color 0.8s ease;
+}
+
+body.abyss .window.focused {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.15);
+  border-color: #552222;
+}
+
+body.abyss .window-titlebar {
+  background: #200808;
+  transition: background 0.8s ease;
+}
+
+body.abyss .window-btn.close,
+body.abyss .window-btn.minimize {
+  background: #FF0000;
+  transition: background 0.5s ease;
+}
+
+body.abyss .window-btn:hover {
+  filter: brightness(1.5) saturate(1.5);
+}
+
+body.abyss .window:not(.focused) .window-btn {
+  background: #882222;
+}
+
+body.abyss .window-title {
+  animation: textFlicker 6s infinite;
+  color: rgba(255, 100, 100, 0.8);
+}
+
+body.abyss .window.focused .window-title {
+  color: rgba(255, 150, 150, 0.9);
+}
+
+body.abyss .window-body {
+  background: rgba(20, 5, 5, 0.95);
+}
+
+body.abyss .window-body::-webkit-scrollbar-thumb {
+  background: #661111;
+}
+
+body.abyss .window-body::-webkit-scrollbar-thumb:hover {
+  background: #882222;
+}
+
+/* ── Dock ── */
+body.abyss #dock-bar {
+  background: rgba(51, 0, 0, 0.85);
+  border-color: rgba(255, 0, 0, 0.15);
+  transition: background 0.8s ease, border-color 0.8s ease;
+}
+
+body.abyss .dock-icon {
+  animation: bloodPulse 4s ease-in-out infinite;
+}
+
+body.abyss .dock-item.active .dock-indicator {
+  background: #FF0000;
+}
+
+/* Dock eyes */
+.dock-eye {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 25%, #cc0000 55%, #330000 100%);
+  pointer-events: none;
+  z-index: 0;
+  animation: dockEyeFadeIn 0.5s ease-out forwards;
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.4);
+}
+
+.dock-eye::before {
+  content: '';
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: #000;
+}
+
+.dock-eye.blink {
+  transform: scaleY(0.1);
+  transition: transform 0.15s ease;
+}
+
+.dock-eye::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: rgba(255, 0, 0, 0.6);
+  animation: tearDrip 3s ease-in infinite;
+  animation-delay: inherit;
+}
+
+/* ── Calendar (abyss) ── */
+body.abyss .calendar-day {
+  transition: color 0.5s ease;
+}
+
+body.abyss .calendar-day.today {
+  animation: jitter 0.5s infinite;
+  color: #FF0000;
+  text-shadow: 0 0 6px rgba(255, 0, 0, 0.4);
+}
+
+body.abyss .calendar-day.other-month {
+  opacity: 0.15;
+  filter: blur(0.5px);
+}
+
+body.abyss .calendar-month-year {
+  animation: textFlicker 8s infinite;
+}
+
+/* ── Todo (abyss) ── */
+body.abyss .todo-checkbox {
+  border-radius: 50%;
+  border-color: #882222;
+  transition: border-radius 0.5s ease, border-color 0.5s ease;
+}
+
+body.abyss .todo-checkbox:checked {
+  background: #880000;
+  border-color: #880000;
+}
+
+body.abyss .todo-delete:hover {
+  color: #FF0000;
+  text-shadow: 0 2px 4px rgba(255, 0, 0, 0.5);
+}
+
+body.abyss .todo-empty {
+  color: #661111;
+  animation: textFlicker 4s infinite;
+}
+
+/* ── Pomodoro (abyss) ── */
+body.abyss .pomodoro-ring-progress {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+body.abyss .pomodoro-time {
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+body.abyss .pomodoro-btn:hover {
+  background: rgba(255, 0, 0, 0.2);
+  border-color: #FF0000;
+  color: #FF0000;
+}
+
+/* ── Scanline (shared) ── */
 .scanline {
   position: absolute;
   width: 100%;
   height: 2px;
   background: rgba(255, 255, 255, 0.05);
   pointer-events: none;
+}
+
+body.abyss .scanline,
+body.abyss #lock-scanline,
+body.abyss #wallpaper-scanline {
+  background: rgba(255, 0, 0, 0.03);
 }
