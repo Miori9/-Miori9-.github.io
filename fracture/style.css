@@ -1,0 +1,26 @@
+html, body, #app, canvas {
+  width: 100%;
+  height: 100%;
+}
+
+html, body {
+  margin: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+#app {
+  display: grid;
+  place-items: center;
+  background: #160305;
+  color: #ffe0dc;
+  font: 14px system-ui, sans-serif;
+}
+
+#status { margin: 0; }
+
+canvas {
+  display: block;
+  position: fixed;
+  inset: 0;
+}
