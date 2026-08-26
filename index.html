@@ -534,13 +534,9 @@
 
     let fractureWindow = null;
 
-    function openFractureApp() {
-        if (fractureWindow?.el.isConnected) {
-            fractureWindow.el.style.zIndex = ++FloatWindow._zTop;
-            return;
-        }
+    function fitFractureWindow() {
+        if (!fractureWindow?.el.isConnected) return;
 
-        fractureWindow = new FloatWindow();
         const margin = 16;
         fractureWindow.w = Math.min(640, window.innerWidth - margin * 2);
         fractureWindow.h = Math.min(480, window.innerHeight - margin * 2);
@@ -551,10 +547,22 @@
         fractureWindow.el.style.width = fractureWindow.w + 'px';
         fractureWindow.el.style.height = fractureWindow.h + 'px';
         fractureWindow._updatePos();
+    }
+
+    function openFractureApp() {
+        if (fractureWindow?.el.isConnected) {
+            fractureWindow.el.style.zIndex = ++FloatWindow._zTop;
+            return;
+        }
+
+        fractureWindow = new FloatWindow();
+        fitFractureWindow();
         fractureWindow.input.style.display = 'none';
         fractureWindow.goBtn.style.display = 'none';
         fractureWindow._showEmbed('fracture/index.html', '柊野');
     }
+
+    window.addEventListener('resize', fitFractureWindow);
 
     // ════════════════════════════════
     //  宠物
