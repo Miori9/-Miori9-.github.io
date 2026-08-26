@@ -541,10 +541,16 @@
         }
 
         fractureWindow = new FloatWindow();
-        fractureWindow.w = 640;
-        fractureWindow.h = 480;
+        const margin = 16;
+        fractureWindow.w = Math.min(640, window.innerWidth - margin * 2);
+        fractureWindow.h = Math.min(480, window.innerHeight - margin * 2);
+        fractureWindow.x = Math.max(margin, Math.min(fractureWindow.x, window.innerWidth - fractureWindow.w - margin));
+        fractureWindow.y = Math.max(margin, Math.min(fractureWindow.y, window.innerHeight - fractureWindow.h - margin));
+        fractureWindow.el.style.minWidth = '0';
+        fractureWindow.el.style.minHeight = '0';
         fractureWindow.el.style.width = fractureWindow.w + 'px';
         fractureWindow.el.style.height = fractureWindow.h + 'px';
+        fractureWindow._updatePos();
         fractureWindow.input.style.display = 'none';
         fractureWindow.goBtn.style.display = 'none';
         fractureWindow._showEmbed('fracture/index.html', '柊野');
