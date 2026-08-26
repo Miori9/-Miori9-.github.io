@@ -7,6 +7,7 @@ const DockSystem = {
     { id: 'todo',     icon: '📝', label: 'Todo List' },
     { id: 'pomodoro', icon: '⏱️', label: 'Pomodoro' },
     { id: 'oc-gallery', icon: '👤', label: 'OC Gallery' },
+    { id: 'hiiragi', icon: '👁', label: '柊野' },
     { id: 'settings', icon: '⚙️', label: 'Settings' },
     { id: 'pet-spawn', icon: '🐾', label: '召唤完能', special: true },
     { id: 'pet-hand',  icon: '🤚', label: '妈妈的手', special: true },
