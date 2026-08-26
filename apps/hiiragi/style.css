@@ -1,0 +1,28 @@
+html,
+body,
+#app,
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  overflow: hidden;
+  touch-action: none;
+  background: #160305;
+}
+
+#app {
+  display: grid;
+  place-items: center;
+  color: #ffe0dc;
+  font: 14px system-ui, sans-serif;
+}
+
+canvas {
+  display: block;
+  position: fixed;
+  inset: 0;
+}
