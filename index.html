@@ -95,6 +95,22 @@
             z-index: 10;
         }
 
+        .desktop-apps {
+            position: fixed; top: 20px; left: 20px;
+            display: flex; flex-direction: column; gap: 12px; z-index: 8000;
+        }
+        .desktop-app {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            border: none; background: transparent; color: #333; cursor: pointer;
+            font-size: 12px; text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+        .desktop-app img {
+            width: 56px; height: 56px; border-radius: 12px; object-fit: cover;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25); transition: transform 0.2s;
+        }
+        .desktop-app:hover img { transform: scale(1.08); }
+        .desktop-app:focus-visible { outline: 2px solid #1565c0; outline-offset: 4px; border-radius: 4px; }
+
         /* ── FAB ── */
         #fab-group {
             position: fixed; bottom: 20px; right: 20px;
@@ -125,6 +141,13 @@
     </style>
 </head>
 <body>
+
+    <div class="desktop-apps">
+        <button class="desktop-app" id="open-fracture-btn" type="button" aria-label="打开柊野">
+            <img src="fracture/assets/IMG_2566.PNG" alt="">
+            <span>柊野</span>
+        </button>
+    </div>
 
     <div id="fab-group">
         <button class="fab" id="add-win-btn"  title="新建窗口">🌐</button>
@@ -508,6 +531,24 @@
         }
     }
     FloatWindow._zTop = 5000;
+
+    let fractureWindow = null;
+
+    function openFractureApp() {
+        if (fractureWindow?.el.isConnected) {
+            fractureWindow.el.style.zIndex = ++FloatWindow._zTop;
+            return;
+        }
+
+        fractureWindow = new FloatWindow();
+        fractureWindow.w = 640;
+        fractureWindow.h = 480;
+        fractureWindow.el.style.width = fractureWindow.w + 'px';
+        fractureWindow.el.style.height = fractureWindow.h + 'px';
+        fractureWindow.input.style.display = 'none';
+        fractureWindow.goBtn.style.display = 'none';
+        fractureWindow._showEmbed('fracture/index.html', '柊野');
+    }
 
     // ════════════════════════════════
     //  宠物
@@ -1059,6 +1100,7 @@
 
         document.getElementById('add-pet-btn').addEventListener('click', spawnPet);
         document.getElementById('add-win-btn').addEventListener('click', () => new FloatWindow());
+        document.getElementById('open-fracture-btn').addEventListener('click', openFractureApp);
         const handBtn = document.getElementById('summon-hand-btn');
         handBtn.addEventListener('click', () => {
             if (window.motherHand) {
