@@ -1,7 +1,3 @@
-# Dreamcore Workspace
-
-沉浸式恐慌梦核克苏鲁风格工作台
-
 ## Phase 1: Core Framework & Unlock System ✅
 
 ### Features
