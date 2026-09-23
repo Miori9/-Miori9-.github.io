@@ -9,9 +9,9 @@ const HiiragiApp = {
 
     this.windowId = WindowManager.create('hiiragi', '柊野', frame, {
       width: Math.min(640, window.innerWidth - 32),
-      height: Math.min(480, window.innerHeight - 32),
+      height: Math.min(480, window.innerHeight - 128),
       x: 16,
-      y: 16,
+      y: 76,
     });
     this.fit();
   },
@@ -21,11 +21,11 @@ const HiiragiApp = {
     if (!record || record.closed) return;
 
     const width = Math.min(640, window.innerWidth - 32);
-    const height = Math.min(480, window.innerHeight - 32);
+    const height = Math.min(480, window.innerHeight - 128);
     record.el.style.setProperty('width', `${width}px`, 'important');
     record.el.style.setProperty('height', `${height}px`, 'important');
     record.el.style.setProperty('left', `${Math.min(Math.max(16, parseFloat(record.el.style.left) || 16), Math.max(16, window.innerWidth - width - 16))}px`, 'important');
-    record.el.style.setProperty('top', `${Math.min(Math.max(16, parseFloat(record.el.style.top) || 16), Math.max(16, window.innerHeight - height - 16))}px`, 'important');
+    record.el.style.setProperty('top', `${Math.min(Math.max(76, parseFloat(record.el.style.top) || 76), Math.max(76, window.innerHeight - height - 52))}px`, 'important');
   },
 
   onClose() {
