@@ -72,7 +72,7 @@ body.abyss .window-titlebar {
 
 body.abyss .window-btn.close,
 body.abyss .window-btn.minimize {
-  background: #FF0000;
+  background: var(--color-red);
   transition: background 0.5s ease;
 }
 
@@ -117,7 +117,7 @@ body.abyss .dock-icon {
 }
 
 body.abyss .dock-item.active .dock-indicator {
-  background: #FF0000;
+  background: var(--color-red);
 }
 
 /* Dock eyes */
@@ -166,7 +166,7 @@ body.abyss .calendar-day {
 
 body.abyss .calendar-day.today {
   animation: jitter 0.5s infinite;
-  color: #FF0000;
+  color: var(--color-red);
   text-shadow: 0 0 6px rgba(255, 0, 0, 0.4);
 }
 
@@ -192,7 +192,7 @@ body.abyss .todo-checkbox:checked {
 }
 
 body.abyss .todo-delete:hover {
-  color: #FF0000;
+  color: var(--color-red);
   text-shadow: 0 2px 4px rgba(255, 0, 0, 0.5);
 }
 
@@ -212,8 +212,8 @@ body.abyss .pomodoro-time {
 
 body.abyss .pomodoro-btn:hover {
   background: rgba(255, 0, 0, 0.2);
-  border-color: #FF0000;
-  color: #FF0000;
+  border-color: var(--color-red);
+  color: var(--color-red);
 }
 
 /* ── Scanline (shared) ── */

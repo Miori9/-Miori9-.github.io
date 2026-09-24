@@ -24,8 +24,8 @@ collage and large background text are hidden. The menu reads `ZHONGYE'S DESKTOP`
 and `Everyone else is me too`. The music panel is visually scaled to two thirds;
 mobile transport buttons retain 44 px touch targets.
 
-Abyss mode colors folders and interface text bright red, and the CD uses a native
-SVG luminance-to-red filter. One random folder and an open window title briefly
+Abyss mode colors folders and interface text `#B00000`, and the CD uses a native
+SVG luminance-to-red filter capped at the same red value. One random folder and an open window title briefly
 flicker every 1.8–5 seconds. These added flickers respect reduced motion and are
 cancelled on exit. Exiting restores the original folder colors, text and CD.
 

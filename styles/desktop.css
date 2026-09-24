@@ -126,18 +126,18 @@ body.abyss #dock-bar { background: none; border: none; }
 }
 
 /* Abyss is a reversible theme, not a filter applied to the whole desktop. */
-body.abyss { --desk-ink: #ff0000; --desk-muted: #ff0000; }
+body.abyss { --color-red: #B00000; --desk-ink: #B00000; --desk-muted: #B00000; }
 body.abyss #desktop-layer :is(.desktop-menubar, .desktop-menubar *, .desktop-ticker, .desktop-footer, .desktop-footer *, .desktop-file, .desktop-file *, #music-player, #music-player *, .window-title, .window-body, .window-body *) {
-  color: #ff0000 !important;
+  color: #B00000 !important;
   text-shadow: none;
 }
-body.abyss .desktop-file .folder-symbol { background: #ff0000; }
+body.abyss .desktop-file .folder-symbol { background: #B00000; }
 body.abyss .desktop-file .folder-symbol::after { background: none; border-color: #8b0000; }
 body.abyss .desktop-file .file-number { text-shadow: 0 1px 1px #000; }
 body.abyss .desktop-file .file-icon, body.abyss .window-title { animation: none; }
 body.abyss .cd-disc { filter: url('#abyss-red-filter'); }
-body.abyss #music-seek { accent-color: #ff0000; }
-body.abyss #music-player button { border-color: #ff000050; }
+body.abyss #music-seek { accent-color: #B00000; }
+body.abyss #music-player button { border-color: #B0000050; }
 body.abyss #wallpaper-base { filter: sepia(.4) saturate(1.4); }
 @media (prefers-reduced-motion: reduce) {
   .cd-disc { animation: none; }
