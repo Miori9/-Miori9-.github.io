@@ -12,17 +12,27 @@
   <link rel="stylesheet" href="styles/desktop.css">
 </head>
 <body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute;pointer-events:none">
+    <defs>
+      <filter id="abyss-red-filter" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
+      </filter>
+    </defs>
+  </svg>
   <!-- Unlock Layer — macOS-style lock screen -->
   <div id="unlock-layer" class="layer">
+    <video id="lock-video" autoplay muted loop playsinline preload="auto" poster="assets/images/desktop-background.jpg" aria-hidden="true" tabindex="-1">
+      <source src="assets/video/start-background.mp4" type="video/mp4">
+    </video>
     <div id="lock-screen">
       <!-- Avatar -->
       <div id="lock-avatar">
         <img id="lock-avatar-img" src="assets/images/eye-realistic.png" alt="avatar">
       </div>
-      <!-- Username — editable with Zalgo corruption overlay -->
+      <!-- Fixed username with the existing Zalgo corruption overlay -->
       <div id="lock-username-wrap">
-        <label id="lock-username-label" for="lock-username">Enter Username</label>
-        <input id="lock-username" type="text" value="" placeholder="" spellcheck="false" autocomplete="off">
+        <label id="lock-username-label" for="lock-username">Username</label>
+        <input id="lock-username" type="text" value="MOM" readonly spellcheck="false" autocomplete="off">
         <div id="lock-username-zalgo" aria-hidden="true"></div>
       </div>
       <!-- Password field -->
@@ -48,8 +58,8 @@
   <div id="desktop-layer" class="layer hidden">
     <div id="wallpaper"></div>
     <header class="desktop-menubar">
-      <span class="desktop-brand"><span aria-hidden="true">◉</span> MIORI'S DESKTOP</span>
-      <span class="desktop-menu-hint">a place to stay a little longer</span>
+      <span class="desktop-brand"><span aria-hidden="true">◉</span> ZHONGYE'S DESKTOP</span>
+      <span class="desktop-menu-hint">Everyone else is me too</span>
       <time id="desktop-clock"></time>
     </header>
     <div class="desktop-ticker" aria-hidden="true">OPEN A FILE <span>↖</span> STAY A WHILE <span>↖</span> PLAY THE CD <span>↖</span> SOMEONE IS HERE <span>↖</span> OPEN A FILE <span>↖</span> STAY A WHILE <span>↖</span> PLAY THE CD</div>
@@ -57,7 +67,7 @@
     <section id="music-player" aria-label="CD 音乐播放器">
       <div class="music-eyebrow"><span>01 / LISTENING ROOM</span><span id="music-indicator">○</span></div>
       <button class="cd-button" id="cd-toggle" type="button" aria-label="播放歌单" aria-pressed="false">
-        <span class="cd-disc"><img id="cd-artwork" src="assets/images/eye-realistic.png" alt="" draggable="false"><span class="cd-print">MIORI — PERSONAL MIX · 583921157</span></span>
+        <span class="cd-disc"><img id="cd-artwork" src="assets/images/eye-realistic.png" alt="" draggable="false"><span class="cd-print">ZHONGYE — PERSONAL MIX · 583921157</span></span>
         <span class="cd-action" aria-hidden="true">PLAY</span>
       </button>
       <div class="music-caption"><span id="music-playlist-name">网易云音乐</span><button id="music-list-toggle" type="button" aria-expanded="false" aria-controls="music-track-list">歌单 ↗</button></div>

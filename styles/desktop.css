@@ -1,6 +1,10 @@
 /* The original window/launch system, presented as a personal desktop. */
 :root { --desk-ink: #e8e7e2; --desk-muted: #a2a29c; }
-#wallpaper-base { background: radial-gradient(ellipse at 25% 20%, #303330, #171a18 75%); }
+#lock-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+#lock-username[readonly] { cursor: default; caret-color: transparent; }
+#lock-screen { text-shadow: 0 2px 8px #000; }
+#wallpaper-base, body.abyss #wallpaper-base { background: #08090a url('../assets/images/desktop-background.jpg') center / cover no-repeat; }
+#wallpaper-collage, .desktop-imprint { display: none; }
 #wallpaper-noise { opacity: .17; }
 .desktop-menubar, .desktop-footer {
   position: absolute; left: 0; right: 0; z-index: 40;
@@ -49,7 +53,7 @@ body.abyss #dock-bar { background: none; border: none; }
 .desktop-file .dock-indicator { margin-top: 6px; }
 .desktop-file.active .file-label { color: #fff; }
 #windows-container { z-index: 100; }
-#music-player { position: absolute; top: 92px; left: 3.3%; width: min(28vw, 325px); z-index: 20; color: var(--desk-ink); }
+#music-player { position: absolute; top: 138px; left: 3.3%; width: min(28vw, 325px); zoom: 0.6666667; z-index: 20; color: var(--desk-ink); }
 .music-eyebrow { display: flex; justify-content: space-between; font: 9px 'Courier New', monospace; letter-spacing: .13em; color: var(--desk-muted); margin-bottom: 18px; }
 #music-indicator { color: #b3b6a7; }
 #music-player.is-playing #music-indicator { color: #e5e9d6; text-shadow: 0 0 8px #e5e9d6; }
@@ -84,7 +88,7 @@ body.abyss #dock-bar { background: none; border: none; }
 #music-track-list button[aria-current='true'] { color: #e4f1d2; border-left: 2px solid #cbdcb2; }
 #music-track-list small { display: block; color: #8f9988; margin-top: 3px; font-size: 10px; }
 @media (max-height: 760px) and (min-width: 701px) {
-  #music-player { top: 82px; width: min(26vw, 275px); }
+  #music-player { top: 123px; width: min(26vw, 275px); }
   .cd-button { width: min(100%, 32vh); margin-inline: auto; }
   .music-caption { margin-top: 14px; }
   #dock { top: 83px; bottom: 55px; }
@@ -96,8 +100,9 @@ body.abyss #dock-bar { background: none; border: none; }
   .desktop-menu-hint { display: none; }
   .desktop-brand { font-size: 9px; letter-spacing: .07em; }
   .desktop-ticker { position: fixed; background: #222720e8; }
-  #music-player { position: relative; top: auto; left: auto; width: min(290px, calc(100% - 48px)); margin: 86px auto 28px; }
+  #music-player { position: relative; top: auto; left: auto; width: min(290px, calc(150vw - 72px)); margin: 129px auto 28px; }
   .cd-button { width: 185px; margin-inline: auto; }
+  .music-controls button { width: 66px; height: 66px; }
   .music-eyebrow { margin-bottom: 12px; }
   .music-caption { margin-top: 16px; }
   #dock { position: relative; inset: auto; margin: 24px 16px; }
@@ -119,6 +124,21 @@ body.abyss #dock-bar { background: none; border: none; }
   #windows-container .window-btn { width: 22px; height: 22px; }
   #windows-container .window-resize-handle { display: none; }
 }
+
+/* Abyss is a reversible theme, not a filter applied to the whole desktop. */
+body.abyss { --desk-ink: #ff0000; --desk-muted: #ff0000; }
+body.abyss #desktop-layer :is(.desktop-menubar, .desktop-menubar *, .desktop-ticker, .desktop-footer, .desktop-footer *, .desktop-file, .desktop-file *, #music-player, #music-player *, .window-title, .window-body, .window-body *) {
+  color: #ff0000 !important;
+  text-shadow: none;
+}
+body.abyss .desktop-file .folder-symbol { background: #ff0000; }
+body.abyss .desktop-file .folder-symbol::after { background: none; border-color: #8b0000; }
+body.abyss .desktop-file .file-number { text-shadow: 0 1px 1px #000; }
+body.abyss .desktop-file .file-icon, body.abyss .window-title { animation: none; }
+body.abyss .cd-disc { filter: url('#abyss-red-filter'); }
+body.abyss #music-seek { accent-color: #ff0000; }
+body.abyss #music-player button { border-color: #ff000050; }
+body.abyss #wallpaper-base { filter: sepia(.4) saturate(1.4); }
 @media (prefers-reduced-motion: reduce) {
   .cd-disc { animation: none; }
 }

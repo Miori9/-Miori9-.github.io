@@ -4,6 +4,8 @@ const HorrorMode = {
   dockEyes: [],
   eyeIntervals: [],
   lastDrift: 0,
+  nextFlicker: 0,
+  flickerAnimations: [],
 
   toggle() {
     if (this.isActive) {
@@ -20,6 +22,7 @@ const HorrorMode = {
     // Flash
     this.flash();
     await this.wait(300);
+    if (!this.isActive) return;
 
     // Toggle CSS
     document.body.classList.add('abyss');
@@ -113,6 +116,7 @@ const HorrorMode = {
 
   // ── Continuous Effects ──
   startContinuousEffects() {
+    this.nextFlicker = 0;
     const animate = (timestamp) => {
       if (!this.isActive) return;
 
@@ -122,9 +126,10 @@ const HorrorMode = {
         this.lastDrift = timestamp;
       }
 
-      // Flicker a random window title
-      if (Math.random() < 0.01) {
-        this.flickerWindowTitle();
+      // Short local flickers, at irregular intervals independent of frame rate.
+      if (timestamp >= this.nextFlicker) {
+        this.flickerDesktop();
+        this.nextFlicker = timestamp + 1800 + Math.random() * 3200;
       }
 
       this.animationFrame = requestAnimationFrame(animate);
@@ -134,6 +139,8 @@ const HorrorMode = {
   },
 
   stopContinuousEffects() {
+    this.flickerAnimations.forEach(animation => animation.cancel());
+    this.flickerAnimations = [];
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
       this.animationFrame = null;
@@ -166,13 +173,19 @@ const HorrorMode = {
     });
   },
 
-  flickerWindowTitle() {
-    const titles = document.querySelectorAll('.window-title');
-    if (titles.length === 0) return;
-
-    const title = titles[Math.floor(Math.random() * titles.length)];
-    title.style.opacity = '0.2';
-    setTimeout(() => { title.style.opacity = ''; }, 80 + Math.random() * 120);
+  flickerDesktop() {
+    this.flickerAnimations.forEach(animation => animation.cancel());
+    this.flickerAnimations = [];
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    for (const selector of ['.desktop-file .file-icon', '.window:not(.minimized) .window-title']) {
+      const elements = document.querySelectorAll(selector);
+      if (!elements.length) continue;
+      const element = elements[Math.floor(Math.random() * elements.length)];
+      this.flickerAnimations.push(element.animate(
+        [{ opacity: 1 }, { opacity: 0.18 }, { opacity: 1 }],
+        { duration: 180 + Math.random() * 140 }
+      ));
+    }
   },
 };
 
