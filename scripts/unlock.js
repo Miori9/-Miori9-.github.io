@@ -8,6 +8,7 @@ const UnlockSystem = {
   usernameWrap: null,
   lockScreen: null,
   unlockLayer: null,
+  backgroundVideo: null,
   noiseCanvas: null,
   noiseCtx: null,
   isUnlocking: false,
@@ -45,6 +46,7 @@ const UnlockSystem = {
     this.usernameWrap = document.getElementById('lock-username-wrap');
     this.lockScreen = document.getElementById('lock-screen');
     this.unlockLayer = document.getElementById('unlock-layer');
+    this.backgroundVideo = document.getElementById('lock-video');
     this.noiseCanvas = document.getElementById('noise-canvas');
 
     if (!this.passwordInput || !this.submitBtn) {
@@ -59,9 +61,29 @@ const UnlockSystem = {
     this.setupEventListeners();
     this.startZalgoUsername();
     this.updateLabelVisibility();
+    this.syncBackgroundVideo();
+    new MutationObserver(() => this.syncBackgroundVideo()).observe(this.unlockLayer, {
+      attributes: true, attributeFilter: ['class']
+    });
+    document.addEventListener('visibilitychange', () => this.syncBackgroundVideo());
+    // A gesture can retry muted playback if the browser blocked autoplay.
+    this.unlockLayer.addEventListener('pointerdown', () => {
+      if (this.backgroundVideo?.paused) this.syncBackgroundVideo();
+    });
 
     // Auto-focus password field
     setTimeout(() => this.passwordInput.focus(), 300);
+  },
+
+  syncBackgroundVideo() {
+    if (!this.backgroundVideo) return;
+    this.backgroundVideo.muted = true;
+    if (document.hidden || this.unlockLayer.classList.contains('hidden')) {
+      this.backgroundVideo.pause();
+    } else {
+      // Keep the poster visible if autoplay is unavailable (e.g. low-power mode).
+      this.backgroundVideo.play().catch(() => {});
+    }
   },
 
   // ── Label visibility ──

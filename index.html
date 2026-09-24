@@ -3,24 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>Dreamcore Workspace</title>
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/animations.css">
   <link rel="stylesheet" href="styles/horror-effects.css">
   <link rel="stylesheet" href="styles/windows.css">
+  <link rel="stylesheet" href="styles/desktop.css">
 </head>
 <body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute;pointer-events:none">
+    <defs>
+      <filter id="abyss-red-filter" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
+        <feComponentTransfer>
+          <feFuncR type="linear" slope="0.6901960784" />
+        </feComponentTransfer>
+      </filter>
+    </defs>
+  </svg>
   <!-- Unlock Layer — macOS-style lock screen -->
   <div id="unlock-layer" class="layer">
+    <video id="lock-video" autoplay muted loop playsinline preload="auto" poster="assets/images/desktop-background.jpg" aria-hidden="true" tabindex="-1">
+      <source src="assets/video/start-background.mp4" type="video/mp4">
+    </video>
     <div id="lock-screen">
       <!-- Avatar -->
       <div id="lock-avatar">
         <img id="lock-avatar-img" src="assets/images/eye-realistic.png" alt="avatar">
       </div>
-      <!-- Username — editable with Zalgo corruption overlay -->
+      <!-- Fixed username with the existing Zalgo corruption overlay -->
       <div id="lock-username-wrap">
-        <label id="lock-username-label" for="lock-username">Enter Username</label>
-        <input id="lock-username" type="text" value="" placeholder="" spellcheck="false" autocomplete="off">
+        <label id="lock-username-label" for="lock-username">Username</label>
+        <input id="lock-username" type="text" value="MOM" readonly spellcheck="false" autocomplete="off">
         <div id="lock-username-zalgo" aria-hidden="true"></div>
       </div>
       <!-- Password field -->
@@ -45,8 +60,38 @@
   <!-- Desktop Layer (initially hidden) -->
   <div id="desktop-layer" class="layer hidden">
     <div id="wallpaper"></div>
+    <header class="desktop-menubar">
+      <span class="desktop-brand"><span aria-hidden="true">◉</span> ZHONGYE'S DESKTOP</span>
+      <span class="desktop-menu-hint">Everyone else is me too</span>
+      <time id="desktop-clock"></time>
+    </header>
+    <div class="desktop-ticker" aria-hidden="true">OPEN A FILE <span>↖</span> STAY A WHILE <span>↖</span> PLAY THE CD <span>↖</span> SOMEONE IS HERE <span>↖</span> OPEN A FILE <span>↖</span> STAY A WHILE <span>↖</span> PLAY THE CD</div>
+    <div class="desktop-imprint" aria-hidden="true"><span>Personal archive / 001</span><strong>Somewhere,<br>between<br>dream &amp; day.</strong><small>NOT EVERYTHING HERE IS ASLEEP.</small></div>
+    <section id="music-player" aria-label="CD 音乐播放器">
+      <div class="music-eyebrow"><span>01 / LISTENING ROOM</span><span id="music-indicator">○</span></div>
+      <button class="cd-button" id="cd-toggle" type="button" aria-label="播放歌单" aria-pressed="false">
+        <span class="cd-disc"><img id="cd-artwork" src="assets/images/eye-realistic.png" alt="" draggable="false"><span class="cd-print">ZHONGYE — PERSONAL MIX · 583921157</span></span>
+        <span class="cd-action" aria-hidden="true">PLAY</span>
+      </button>
+      <div class="music-caption"><span id="music-playlist-name">网易云音乐</span><button id="music-list-toggle" type="button" aria-expanded="false" aria-controls="music-track-list">歌单 ↗</button></div>
+      <p id="music-song-title">载入歌单…</p>
+      <p id="music-artist"></p>
+      <input id="music-seek" type="range" min="0" max="1000" value="0" aria-label="播放进度" disabled>
+      <div class="music-time"><span id="music-elapsed">0:00</span><span id="music-duration">0:00</span></div>
+      <div class="music-controls">
+        <button id="music-prev" type="button" aria-label="上一首">⏮</button>
+        <button id="music-play" type="button" aria-label="播放">▶</button>
+        <button id="music-next" type="button" aria-label="下一首">⏭</button>
+        <span id="music-count"></span>
+      </div>
+      <p id="music-status" role="status" aria-live="polite">点击 CD 开始播放</p>
+      <a class="music-source" href="https://music.163.com/playlist?id=583921157" target="_blank" rel="noopener noreferrer">在网易云中打开 ↗</a>
+      <ol id="music-track-list" aria-label="歌单曲目" hidden></ol>
+      <audio id="desktop-audio" preload="none" playsinline></audio>
+    </section>
     <div id="windows-container"></div>
-    <div id="dock"></div>
+    <nav id="dock" aria-label="桌面文件"></nav>
+    <footer class="desktop-footer"><span>My little corner <span aria-hidden="true">↖</span></span><span class="desktop-footer-hint">点击打开 · 拖动整理</span><button id="desktop-reset" type="button">整理桌面 ↺</button></footer>
   </div>
 
   <script src="scripts/core.js"></script>
@@ -62,5 +107,7 @@
   <script src="scripts/horror-mode.js"></script>
   <script src="scripts/pet.js"></script>
   <script src="scripts/dock.js"></script>
+  <script src="assets/music/playlist.js"></script>
+  <script src="scripts/music.js"></script>
 </body>
 </html>
